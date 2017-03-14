@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@color/white"
+    android:elevation="5dp"
+    android:gravity="center_horizontal"
+    android:paddingBottom="20dp"
+    android:paddingTop="30dp"
+    tools:showIn="@layout/content_main">
+
+    <LinearLayout
+        android:id="@+id/ll_storage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.dinuscxj.progressbar.CircleProgressBar
+            android:id="@+id/progress_storage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:progress_background_color="#BDDFFB"
+            app:progress_end_color="#0F88EB"
+            app:progress_start_color="#0F88EB"
+            app:progress_stroke_width="23dp"
+            app:progress_text_color="@color/colorPrimary"
+            app:progress_text_size="22sp"
+            app:style="solid_line" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:text="存储空间" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_toEndOf="@id/ll_storage"
+        android:orientation="vertical">
+
+        <com.dinuscxj.progressbar.CircleProgressBar
+            android:id="@+id/progress_memory"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:progress_background_color="#BDDFFB"
+            app:progress_end_color="#0F88EB"
+            app:progress_start_color="#0F88EB"
+            app:progress_stroke_width="15dp"
+            app:progress_text_color="@color/colorPrimary"
+            app:progress_text_size="14sp"
+            app:style="solid_line" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:text="内存" />
+    </LinearLayout>
+</RelativeLayout>
+
