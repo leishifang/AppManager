@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initView();
+
         updateStorageState();
         updateMemoryState();
         /**
