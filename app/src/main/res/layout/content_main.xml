@@ -11,8 +11,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.giggle.appmanager.MainActivity"
-    tools:showIn="@layout/app_bar_main">
+    tools:context="com.example.giggle.appmanager.MainActivity">
 
     <include layout="@layout/head_layout_storage_state" />
 
@@ -42,9 +41,8 @@
                 android:gravity="center">
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true">
+                    android:id="@+id/btn_app"
+                    style="@style/main_item_style">
 
                     <ImageView
                         android:id="@+id/imageView_app"
@@ -68,9 +66,8 @@
                 android:gravity="center">
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true">
+                    android:id="@+id/btn_apk"
+                    style="@style/main_item_style">
 
                     <ImageView
                         android:id="@+id/imageView_apk"
@@ -101,9 +98,8 @@
                 android:gravity="center">
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true">
+                    android:id="@+id/btn_processes"
+                    style="@style/main_item_style">
 
                     <ImageView
                         android:id="@+id/imageView_processes"
@@ -127,9 +123,8 @@
                 android:gravity="center">
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true">
+                    android:id="@+id/btn_more"
+                    style="@style/main_item_style">
 
                     <ImageView
                         android:id="@+id/imageView_more"
