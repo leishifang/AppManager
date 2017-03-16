@@ -14,7 +14,7 @@
     tools:context="com.example.giggle.appmanager.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <include layout="@layout/storage_state_head_layout" />
+    <include layout="@layout/head_layout_storage_state" />
 
     <LinearLayout
         android:layout_width="match_parent"
