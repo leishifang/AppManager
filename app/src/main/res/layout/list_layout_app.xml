@@ -2,9 +2,19 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true">
 
     <include layout="@layout/toolbar" />
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/img_loading"
+        android:layout_gravity="center"
+        app:indicatorColor="@color/colorPrimary"
+        style="@style/AVLoadingIndicatorView.Large"
+        app:indicatorName="BallTrianglePathIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

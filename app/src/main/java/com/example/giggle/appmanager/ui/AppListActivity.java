@@ -1,7 +1,13 @@
 package com.example.giggle.appmanager.ui;
 
+import android.content.pm.IPackageStatsObserver;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageStats;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,12 +16,24 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.adapter.AppAdapter;
+import com.example.giggle.appmanager.bean.AppInfo;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
+import com.wang.avi.AVLoadingIndicatorView;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by leishifang on 2017/3/16 10:55.
@@ -27,6 +45,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private static final String TAG = "APPLISTACTIVITY";
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+    @BindView(R.id.img_loading)
+    AVLoadingIndicatorView mImgLoading;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
@@ -39,13 +59,70 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mImgLoading.show();
+
+        Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<AppInfo>> e) throws Exception {
+                e.onNext(getInfo());
+                e.onComplete();
+            }
+        })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<AppInfo>>() {
+                    @Override
+                    public void accept(List<AppInfo> appInfos) throws Exception {
+                        setAppList(appInfos);
+                    }
+                });
+    }
+
+    private List<AppInfo> getInfo() {
+        PackageManager pm = getApplicationContext().getPackageManager();
+        List<PackageInfo> infos = pm.getInstalledPackages(0);
+        List<AppInfo> appInfos = new ArrayList<AppInfo>();
+
+        for (PackageInfo info : infos) {
+
+            String label = pm.getApplicationLabel(info.applicationInfo).toString();
+            String packageName = info.packageName;
+            String version = info.versionName;
+            Drawable icon = pm.getApplicationIcon(info.applicationInfo);
+
+            final AppInfo tempInfo = new AppInfo(label, packageName, version, icon, 0);
+
+            try {
+                Method mGetPackageSizeInfoMethod;
+                mGetPackageSizeInfoMethod = PackageManager.class.getMethod("getPackageSizeInfo", new
+                        Class[]{String.class, IPackageStatsObserver.class});
+                mGetPackageSizeInfoMethod.invoke(pm, new Object[]{
+                        packageName,
+                        new IPackageStatsObserver.Stub() {
+                            @Override
+                            public void onGetStatsCompleted(PackageStats pStats, boolean succeeded)
+                                    throws RemoteException {
+                                tempInfo.setSize(pStats.cacheSize + pStats.codeSize + pStats
+                                        .dataSize);
+                            }
+                        }
+                });
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            appInfos.add(tempInfo);
+        }
+        return appInfos;
+    }
+
+    private void setAppList(List<AppInfo> infos) {
+
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
         //adapter
-        final AppAdapter myItemAdapter = new AppAdapter(new int[]{1, 2, 3, -4,
-                5, 0});
+        final AppAdapter myItemAdapter = new AppAdapter(infos);
 
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);       //
         // wrap for expanding
@@ -60,6 +137,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         mRecyclerView.setHasFixedSize(false);
 
         mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
+
+        mImgLoading.hide();
     }
 
     private boolean supportsViewElevation() {

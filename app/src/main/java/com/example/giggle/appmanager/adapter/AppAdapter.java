@@ -19,21 +19,25 @@ package com.example.giggle.appmanager.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.giggle.appmanager.R;
+import com.example.giggle.appmanager.bean.AppInfo;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
+import java.util.List;
+
 public class AppAdapter
         extends AbstractExpandableItemAdapter<AppAdapter.MyGroupViewHolder,
         AppAdapter.MyChildViewHolder> {
 
-    private static final String TAG = "MyExpandableItemAdapter";
-    int[] data;
+    private static final String TAG = "AppAdapter";
+    List<AppInfo> mAppInfos;
 
-    // NOTE: Make accessible with short name
     private interface Expandable extends ExpandableItemConstants {
 
     }
@@ -41,10 +45,16 @@ public class AppAdapter
     public static class MyGroupViewHolder extends AbstractExpandableItemViewHolder {
 
         public ExpandableItemIndicator mIndicator;
+        private ImageView iconImageView;
+        private TextView lableTextView;
+        private TextView sizeTextView;
 
         public MyGroupViewHolder(View v) {
             super(v);
             mIndicator = (ExpandableItemIndicator) v.findViewById(R.id.indicator);
+            iconImageView = (ImageView) v.findViewById(R.id.img_icon);
+            lableTextView = (TextView) v.findViewById(R.id.tv_lable);
+            sizeTextView = (TextView) v.findViewById(R.id.tv_size);
         }
     }
 
@@ -55,23 +65,30 @@ public class AppAdapter
         }
     }
 
-    public AppAdapter(int[] data) {
+    public AppAdapter() {
+        setHasStableIds(true);
+    }
 
-        this.data = data;
-
+    public AppAdapter(List<AppInfo> infos) {
+        this();
+        this.mAppInfos = infos;
         // ExpandableItemAdapter requires stable ID, and also
         // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
-        setHasStableIds(true);
+    }
+
+    public void setData(List<AppInfo> infos) {
+        mAppInfos = infos;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getGroupCount() {
-        return data.length;
+        return mAppInfos.size();
     }
 
     @Override
     public int getChildCount(int groupPosition) {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -110,8 +127,11 @@ public class AppAdapter
 
     @Override
     public void onBindGroupViewHolder(MyGroupViewHolder holder, int groupPosition, int viewType) {
-
         updateIndicatorState(holder);
+        AppInfo info = mAppInfos.get(groupPosition);
+        holder.lableTextView.setText(info.getLable());
+        holder.iconImageView.setImageDrawable(info.getIcon());
+        holder.sizeTextView.setText((info.getSize() >> 20) + " MB");
     }
 
     @Override

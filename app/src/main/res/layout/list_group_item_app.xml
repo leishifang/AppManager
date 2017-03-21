@@ -27,6 +27,13 @@
     android:foreground="?attr/selectableItemBackground"
     tools:ignore="UselessParent">
 
+    <com.example.giggle.appmanager.widget.ExpandableItemIndicator
+        android:id="@+id/indicator"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="16dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,8 +43,8 @@
 
         <ImageView
             android:id="@+id/img_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@mipmap/ic_launcher" />
 
         <LinearLayout
@@ -48,7 +55,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_table"
+                android:id="@+id/tv_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="my application" />
@@ -60,12 +67,5 @@
                 android:text="45MB" />
         </LinearLayout>
     </LinearLayout>
-
-    <com.example.giggle.appmanager.widget.ExpandableItemIndicator
-        android:id="@+id/indicator"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="right|center_vertical"
-        android:layout_marginRight="16dp" />
 
 </FrameLayout>
