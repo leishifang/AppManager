@@ -7,12 +7,14 @@ import android.content.pm.PackageStats;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.adapter.AppAdapter;
@@ -24,6 +26,8 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -42,7 +46,9 @@ import io.reactivex.schedulers.Schedulers;
 public class AppListActivity extends AppCompatActivity implements RecyclerViewExpandableItemManager
         .OnGroupExpandListener, RecyclerViewExpandableItemManager.OnGroupCollapseListener {
 
+    private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = "APPLISTACTIVITY";
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.img_loading)
@@ -60,6 +66,10 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         setSupportActionBar(toolbar);
 
         mImgLoading.show();
+
+        final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable
+                (SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
+        mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
 
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
@@ -81,7 +91,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private List<AppInfo> getInfo() {
         PackageManager pm = getApplicationContext().getPackageManager();
         List<PackageInfo> infos = pm.getInstalledPackages(0);
-        List<AppInfo> appInfos = new ArrayList<AppInfo>();
+        final List<AppInfo> appInfos = new ArrayList<AppInfo>();
 
         for (PackageInfo info : infos) {
 
@@ -89,8 +99,10 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             String packageName = info.packageName;
             String version = info.versionName;
             Drawable icon = pm.getApplicationIcon(info.applicationInfo);
-
-            final AppInfo tempInfo = new AppInfo(label, packageName, version, icon, 0);
+            Long installTime = info.firstInstallTime;
+            Long updateTime = info.lastUpdateTime;
+            final AppInfo tempInfo = new AppInfo(label, packageName, version, icon, 0, installTime,
+                    updateTime);
 
             try {
                 Method mGetPackageSizeInfoMethod;
@@ -102,22 +114,32 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                             @Override
                             public void onGetStatsCompleted(PackageStats pStats, boolean succeeded)
                                     throws RemoteException {
+                                //异步操作，appinfos需要等待所有item添加完毕
                                 tempInfo.setSize(pStats.cacheSize + pStats.codeSize + pStats
                                         .dataSize);
+                                appInfos.add(tempInfo);
                             }
                         }
                 });
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            appInfos.add(tempInfo);
         }
+
+        //等待所有item添加完毕
+        while (appInfos.size() < infos.size()) {}
+        // 按照应用名排序
+        Collections.sort(appInfos, new Comparator<AppInfo>() {
+            @Override
+            public int compare(AppInfo info, AppInfo t1) {
+                return info.getLable().compareTo(t1.getLable());
+            }
+        });
         return appInfos;
     }
 
     private void setAppList(List<AppInfo> infos) {
 
-        mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
@@ -134,11 +156,23 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mWrappedAdapter);  // requires *wrapped* adapter
         mRecyclerView.setItemAnimator(animator);
-        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
 
         mImgLoading.hide();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // save current state to support screen rotation, etc...
+        if (mRecyclerViewExpandableItemManager != null) {
+            outState.putParcelable(
+                    SAVED_STATE_EXPANDABLE_ITEM_MANAGER,
+                    mRecyclerViewExpandableItemManager.getSavedState());
+        }
     }
 
     private boolean supportsViewElevation() {
