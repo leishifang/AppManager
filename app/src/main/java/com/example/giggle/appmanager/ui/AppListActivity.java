@@ -14,7 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.adapter.AppAdapter;
@@ -53,6 +54,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     RecyclerView mRecyclerView;
     @BindView(R.id.img_loading)
     AVLoadingIndicatorView mImgLoading;
+    @BindView(R.id.tv_progress)
+    TextView mTvProgress;
+
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
@@ -61,12 +65,18 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout_app);
+
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        mImgLoading.show();
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        showProgress();
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable
                 (SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
@@ -90,9 +100,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
 
     private List<AppInfo> getInfo() {
         PackageManager pm = getApplicationContext().getPackageManager();
-        List<PackageInfo> infos = pm.getInstalledPackages(0);
+        final List<PackageInfo> infos = pm.getInstalledPackages(0);
         final List<AppInfo> appInfos = new ArrayList<AppInfo>();
-
+        final int[] progress = {0};
         for (PackageInfo info : infos) {
 
             String label = pm.getApplicationLabel(info.applicationInfo).toString();
@@ -101,6 +111,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             Drawable icon = pm.getApplicationIcon(info.applicationInfo);
             Long installTime = info.firstInstallTime;
             Long updateTime = info.lastUpdateTime;
+
             final AppInfo tempInfo = new AppInfo(label, packageName, version, icon, 0, installTime,
                     updateTime);
 
@@ -118,6 +129,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                                 tempInfo.setSize(pStats.cacheSize + pStats.codeSize + pStats
                                         .dataSize);
                                 appInfos.add(tempInfo);
+                                updateProgress(progress[0]++, infos.size());
                             }
                         }
                 });
@@ -127,7 +139,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         }
 
         //等待所有item添加完毕
-        while (appInfos.size() < infos.size()) {}
+        while (appInfos.size() < infos.size()) {
+        }
         // 按照应用名排序
         Collections.sort(appInfos, new Comparator<AppInfo>() {
             @Override
@@ -160,7 +173,29 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
 
         mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
 
+        hideProgress();
+    }
+
+    private void updateProgress(int progress, int total) {
+
+        Observable.just(new int[]{progress, total})
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<int[]>() {
+                    @Override
+                    public void accept(int[] ints) throws Exception {
+                        mTvProgress.setText(ints[0] + "/" + ints[1]);
+                    }
+                });
+    }
+
+    public void showProgress() {
+        mImgLoading.show();
+        mTvProgress.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgress() {
         mImgLoading.hide();
+        mTvProgress.setVisibility(View.INVISIBLE);
     }
 
     @Override
