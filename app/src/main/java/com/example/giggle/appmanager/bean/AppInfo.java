@@ -31,6 +31,11 @@ public class AppInfo {
      */
     private long lastUpdateTime;
 
+    /**
+     * 是否是系统应用
+     */
+    private boolean isSystem;
+
     public AppInfo() {
     }
 

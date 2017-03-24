@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -215,12 +214,12 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     }
 
     private void adjustScrollPositionOnGroupExpanded(int groupPosition) {
+        // TODO: 2017/3/24 scroll to the last group exactly
         int childItemHeight = this.getResources().getDimensionPixelSize(R.dimen.list_item_height);
         int topMargin = (int) (this.getResources().getDisplayMetrics().density * 16); //
         // top-spacing: 16dp
         int bottomMargin = topMargin; // bottom-spacing: 16dp
-
-        mRecyclerViewExpandableItemManager.scrollToGroup(groupPosition, childItemHeight, topMargin,
+        mRecyclerViewExpandableItemManager.scrollToGroup(groupPosition, childItemHeight * 2, topMargin,
                 bottomMargin);
     }
 

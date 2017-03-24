@@ -16,12 +16,16 @@
 
 package com.example.giggle.appmanager.adapter;
 
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.AppInfo;
 import com.example.giggle.appmanager.utils.DateUtils;
@@ -30,7 +34,6 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConsta
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
-import java.text.DateFormat;
 import java.util.List;
 
 import butterknife.BindView;
@@ -73,6 +76,12 @@ public class AppAdapter
         TextView mTvInstallTime;
         @BindView(R.id.tv_update_time)
         TextView mTvUpdateTime;
+        @BindView(R.id.btn_launch)
+        Button mBtnLaunch;
+        @BindView(R.id.btn_uninstall)
+        Button mBtnUninstall;
+        @BindView(R.id.btn_share)
+        Button mBtnShare;
 
         public MyChildViewHolder(View v) {
             super(v);
@@ -152,11 +161,24 @@ public class AppAdapter
     @Override
     public void onBindChildViewHolder(MyChildViewHolder holder, int groupPosition, int childPosition, int
             viewType) {
-        AppInfo info = mAppInfos.get(groupPosition);
+        final AppInfo info = mAppInfos.get(groupPosition);
         holder.mTvPackageName.setText(info.getPackageName());
         holder.mTvVersion.setText(info.getVersion());
         holder.mTvInstallTime.setText(DateUtils.convertTimeMill(info.getFirstInstallTime()));
         holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getLastUpdateTime()));
+        holder.mBtnLaunch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = MyApplication.getContext().getPackageManager().getLaunchIntentForPackage
+                        (info.getPackageName());
+                if (intent != null) {
+                    MyApplication.getContext().startActivity(intent);
+                }
+                else{
+                    Snackbar.make(view,"无法启动此应用",Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void updateIndicatorState(MyGroupViewHolder holder) {

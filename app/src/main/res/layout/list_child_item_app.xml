@@ -41,6 +41,7 @@
             android:id="@+id/tv_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="238dp"
             tools:text="12.1.01.4231" />
     </LinearLayout>
 
@@ -81,25 +82,18 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:foreground="?attr/selectableItemBackground"
-            android:text="启动"
-            android:textColor="#3F51B5" />
+            android:id="@+id/btn_launch"
+            style="@style/btn_item_style"
+            android:text="启动" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:text="卸载"
-            android:textColor="#3F51B5" />
+            android:id="@+id/btn_uninstall"
+            style="@style/btn_item_style"
+            android:text="卸载" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:text="分享"
-            android:textColor="#3F51B5" />
+            android:id="@+id/btn_share"
+            style="@style/btn_item_style"
+            android:text="分享" />
     </LinearLayout>
 </LinearLayout>
