@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageStats;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.RemoteException;
@@ -14,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -81,6 +81,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 (SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
 
+        // TODO: 2017/3/23 未进行生命周期控制
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> e) throws Exception {
@@ -104,7 +105,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         final List<AppInfo> appInfos = new ArrayList<AppInfo>();
         final int[] progress = {0};
         for (PackageInfo info : infos) {
-
             String label = pm.getApplicationLabel(info.applicationInfo).toString();
             String packageName = info.packageName;
             String version = info.versionName;
@@ -152,7 +152,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     }
 
     private void setAppList(List<AppInfo> infos) {
-
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
@@ -176,16 +175,14 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         hideProgress();
     }
 
-    private void updateProgress(int progress, int total) {
+    private void updateProgress(final int progress, final int total) {
 
-        Observable.just(new int[]{progress, total})
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<int[]>() {
-                    @Override
-                    public void accept(int[] ints) throws Exception {
-                        mTvProgress.setText(ints[0] + "/" + ints[1]);
-                    }
-                });
+        mTvProgress.post(new Runnable() {
+            @Override
+            public void run() {
+                mTvProgress.setText(progress + "/" + total);
+            }
+        });
     }
 
     public void showProgress() {
@@ -208,10 +205,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                     SAVED_STATE_EXPANDABLE_ITEM_MANAGER,
                     mRecyclerViewExpandableItemManager.getSavedState());
         }
-    }
-
-    private boolean supportsViewElevation() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
     }
 
     @Override
