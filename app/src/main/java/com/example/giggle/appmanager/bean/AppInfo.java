@@ -15,7 +15,7 @@ public class AppInfo {
     /**
      * 包名
      */
-    private String packageNmae;
+    private String packageName;
     private String versionName;
     private Drawable icon;
     /**
@@ -34,10 +34,10 @@ public class AppInfo {
     public AppInfo() {
     }
 
-    public AppInfo(String lable, String packageNmae, String versionName, Drawable icon, long size, long
+    public AppInfo(String lable, String packageName, String versionName, Drawable icon, long size, long
             firstInstallTime, long lastUpdateTime) {
         this.lable = lable;
-        this.packageNmae = packageNmae;
+        this.packageName = packageName;
         this.versionName = versionName;
         this.icon = icon;
         this.size = size;
@@ -45,8 +45,8 @@ public class AppInfo {
         this.lastUpdateTime = lastUpdateTime;
     }
 
-    public AppInfo(String lable, String packageNmae, String version, Drawable icon, long size) {
-        this(lable, packageNmae, version, icon, size, 0, 0);
+    public AppInfo(String lable, String packageName, String version, Drawable icon, long size) {
+        this(lable, packageName, version, icon, size, 0, 0);
     }
 
     public String getLable() {
@@ -57,12 +57,12 @@ public class AppInfo {
         this.lable = lable;
     }
 
-    public String getPackageNmae() {
-        return packageNmae;
+    public String getPackageName() {
+        return packageName;
     }
 
-    public void setPackageNmae(String packageNmae) {
-        this.packageNmae = packageNmae;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public String getVersion() {

@@ -16,7 +16,6 @@
 
 package com.example.giggle.appmanager.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +24,17 @@ import android.widget.TextView;
 
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.AppInfo;
+import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
+import java.text.DateFormat;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class AppAdapter
         extends AbstractExpandableItemAdapter<AppAdapter.MyGroupViewHolder,
@@ -61,8 +65,18 @@ public class AppAdapter
 
     public static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
 
+        @BindView(R.id.tv_package_name)
+        TextView mTvPackageName;
+        @BindView(R.id.tv_version)
+        TextView mTvVersion;
+        @BindView(R.id.tv_install_time)
+        TextView mTvInstallTime;
+        @BindView(R.id.tv_update_time)
+        TextView mTvUpdateTime;
+
         public MyChildViewHolder(View v) {
             super(v);
+            ButterKnife.bind(this, v);
         }
     }
 
@@ -138,10 +152,14 @@ public class AppAdapter
     @Override
     public void onBindChildViewHolder(MyChildViewHolder holder, int groupPosition, int childPosition, int
             viewType) {
+        AppInfo info = mAppInfos.get(groupPosition);
+        holder.mTvPackageName.setText(info.getPackageName());
+        holder.mTvVersion.setText(info.getVersion());
+        holder.mTvInstallTime.setText(DateUtils.convertTimeMill(info.getFirstInstallTime()));
+        holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getLastUpdateTime()));
     }
 
     private void updateIndicatorState(MyGroupViewHolder holder) {
-        // set background resource (target view ID: container)
         final int expandState = holder.getExpandStateFlags();
 
         if ((expandState & ExpandableItemConstants.STATE_FLAG_IS_UPDATED) != 0) {

@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
     android:background="@color/white"
     android:elevation="2dp"
-    android:paddingLeft="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingLeft="@dimen/left_padding">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -23,6 +24,7 @@
             android:id="@+id/tv_package_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="248dp"
             tools:text="com.example.giggle.appmanager" />
     </LinearLayout>
 
@@ -42,4 +44,62 @@
             tools:text="12.1.01.4231" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="安装时间：" />
+
+        <TextView
+            android:id="@+id/tv_install_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2017/3/24" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更新时间：" />
+
+        <TextView
+            android:id="@+id/tv_update_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2017/3/24" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:foreground="?attr/selectableItemBackground"
+            android:text="启动"
+            android:textColor="#3F51B5" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:text="卸载"
+            android:textColor="#3F51B5" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:text="分享"
+            android:textColor="#3F51B5" />
+    </LinearLayout>
 </LinearLayout>
