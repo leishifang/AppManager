@@ -32,11 +32,25 @@ public class AppInfo {
     private long lastUpdateTime;
 
     /**
+     * Full path to the base APK for this application
+     */
+    private String apkPath;
+    /**
      * 是否是系统应用
      */
     private boolean isSystem;
 
-    public AppInfo() {
+    public AppInfo(String lable, String packageName, String versionName, Drawable icon, long size, long
+            firstInstallTime, long lastUpdateTime, String apkPath, boolean isSystem) {
+        this.lable = lable;
+        this.packageName = packageName;
+        this.versionName = versionName;
+        this.icon = icon;
+        this.size = size;
+        this.firstInstallTime = firstInstallTime;
+        this.lastUpdateTime = lastUpdateTime;
+        this.apkPath = apkPath;
+        this.isSystem = isSystem;
     }
 
     public AppInfo(String lable, String packageName, String versionName, Drawable icon, long size, long
@@ -48,10 +62,6 @@ public class AppInfo {
         this.size = size;
         this.firstInstallTime = firstInstallTime;
         this.lastUpdateTime = lastUpdateTime;
-    }
-
-    public AppInfo(String lable, String packageName, String version, Drawable icon, long size) {
-        this(lable, packageName, version, icon, size, 0, 0);
     }
 
     public String getLable() {

@@ -17,6 +17,7 @@
 package com.example.giggle.appmanager.adapter;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConsta
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -173,10 +175,26 @@ public class AppAdapter
                         (info.getPackageName());
                 if (intent != null) {
                     MyApplication.getContext().startActivity(intent);
+                } else {
+                    Snackbar.make(view, "无法启动此应用", Snackbar.LENGTH_SHORT).show();
                 }
-                else{
-                    Snackbar.make(view,"无法启动此应用",Snackbar.LENGTH_SHORT).show();
-                }
+            }
+        });
+        holder.mBtnUninstall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent deleteIntent = new Intent();
+                deleteIntent.setAction(Intent.ACTION_DELETE);
+                deleteIntent.setData(Uri
+                        .parse("package:" + info.getPackageName()));
+                deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                MyApplication.getContext().startActivity(deleteIntent);
+            }
+        });
+        holder.mBtnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }

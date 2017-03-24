@@ -1,5 +1,6 @@
 package com.example.giggle.appmanager.ui;
 
+import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -110,9 +111,11 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             Drawable icon = pm.getApplicationIcon(info.applicationInfo);
             Long installTime = info.firstInstallTime;
             Long updateTime = info.lastUpdateTime;
-
+            String path = info.applicationInfo.sourceDir;
+            // TODO: 2017/3/24 弄懂flag是啥
+            boolean isSys = !((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0);
             final AppInfo tempInfo = new AppInfo(label, packageName, version, icon, 0, installTime,
-                    updateTime);
+                    updateTime, path, isSys);
 
             try {
                 Method mGetPackageSizeInfoMethod;
