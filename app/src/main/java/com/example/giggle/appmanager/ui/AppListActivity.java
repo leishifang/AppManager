@@ -1,5 +1,6 @@
 package com.example.giggle.appmanager.ui;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageInfo;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,6 +51,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
 
     private static final String SAVED_STATE_EXPANDABLE_ITEM_MANAGER = "RecyclerViewExpandableItemManager";
     private static final String TAG = "APPLISTACTIVITY";
+    public static final int UNINSTALL_REQUEST_CODE = 1;
+    public static final String POSITIOIN = "POSITION_OF_GROUP";
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
@@ -58,6 +62,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     TextView mTvProgress;
 
     private RecyclerView.LayoutManager mLayoutManager;
+    private AppAdapter myItemAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
 
@@ -158,7 +163,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
         //adapter
-        final AppAdapter myItemAdapter = new AppAdapter(infos);
+        myItemAdapter = new AppAdapter(infos, this);
 
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);       //
         // wrap for expanding
@@ -229,5 +234,17 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     @Override
     public void onGroupCollapse(int groupPosition, boolean fromUser, Object payload) {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: " + requestCode + "," + resultCode);
+        switch (requestCode) {
+            case UNINSTALL_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    myItemAdapter.removeItem(myItemAdapter.getCurrentPosition());
+                }
+        }
     }
 }

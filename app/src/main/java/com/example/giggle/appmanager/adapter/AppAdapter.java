@@ -16,9 +16,11 @@
 
 package com.example.giggle.appmanager.adapter;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,13 +31,13 @@ import android.widget.TextView;
 import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.AppInfo;
+import com.example.giggle.appmanager.ui.AppListActivity;
 import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
-import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,7 +48,12 @@ public class AppAdapter
         AppAdapter.MyChildViewHolder> {
 
     private static final String TAG = "AppAdapter";
-    List<AppInfo> mAppInfos;
+    private List<AppInfo> mAppInfos;
+    private Activity mContext;
+    /**
+     * 卸载应用的position
+     */
+    private int currentPosition;
 
     private interface Expandable extends ExpandableItemConstants {
 
@@ -92,14 +99,15 @@ public class AppAdapter
     }
 
     public AppAdapter() {
+        // ExpandableItemAdapter requires stable ID, and also
+        // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
         setHasStableIds(true);
     }
 
-    public AppAdapter(List<AppInfo> infos) {
+    public AppAdapter(List<AppInfo> infos, Activity context) {
         this();
         this.mAppInfos = infos;
-        // ExpandableItemAdapter requires stable ID, and also
-        // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
+        mContext = context;
     }
 
     public void setData(List<AppInfo> infos) {
@@ -137,6 +145,14 @@ public class AppAdapter
         return 0;
     }
 
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
     @Override
     public MyGroupViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -161,8 +177,9 @@ public class AppAdapter
     }
 
     @Override
-    public void onBindChildViewHolder(MyChildViewHolder holder, int groupPosition, int childPosition, int
-            viewType) {
+    public void onBindChildViewHolder(MyChildViewHolder holder, final int groupPosition, int childPosition,
+                                      int
+                                              viewType) {
         final AppInfo info = mAppInfos.get(groupPosition);
         holder.mTvPackageName.setText(info.getPackageName());
         holder.mTvVersion.setText(info.getVersion());
@@ -183,12 +200,12 @@ public class AppAdapter
         holder.mBtnUninstall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent deleteIntent = new Intent();
-                deleteIntent.setAction(Intent.ACTION_DELETE);
-                deleteIntent.setData(Uri
-                        .parse("package:" + info.getPackageName()));
-                deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getContext().startActivity(deleteIntent);
+                Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+                intent.setData(Uri.parse("package:" + info.getPackageName()));
+                intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+                intent.putExtra(AppListActivity.POSITIOIN, groupPosition);
+                setCurrentPosition(groupPosition);
+                mContext.startActivityForResult(intent, AppListActivity.UNINSTALL_REQUEST_CODE);
             }
         });
         holder.mBtnShare.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +214,15 @@ public class AppAdapter
 
             }
         });
+    }
+
+    public void removeItem(int groupPosition) {
+        Log.d(TAG, "removeItem: " + groupPosition);
+        mAppInfos.remove(groupPosition);
+        //不设置会导致删除项不折叠
+        notifyItemRemoved(groupPosition);
+        //不设置会导致列表顺序错乱
+        notifyDataSetChanged();
     }
 
     private void updateIndicatorState(MyGroupViewHolder holder) {
