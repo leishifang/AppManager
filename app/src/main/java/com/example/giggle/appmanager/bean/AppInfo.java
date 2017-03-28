@@ -53,17 +53,6 @@ public class AppInfo {
         this.isSystem = isSystem;
     }
 
-    public AppInfo(String lable, String packageName, String versionName, Drawable icon, long size, long
-            firstInstallTime, long lastUpdateTime) {
-        this.lable = lable;
-        this.packageName = packageName;
-        this.versionName = versionName;
-        this.icon = icon;
-        this.size = size;
-        this.firstInstallTime = firstInstallTime;
-        this.lastUpdateTime = lastUpdateTime;
-    }
-
     public String getLable() {
         return lable;
     }
@@ -118,5 +107,13 @@ public class AppInfo {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public String getApkPath() {
+        return apkPath;
+    }
+
+    public void setApkPath(String apkPath) {
+        this.apkPath = apkPath;
     }
 }

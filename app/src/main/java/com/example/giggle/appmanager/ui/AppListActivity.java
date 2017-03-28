@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +62,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     AVLoadingIndicatorView mImgLoading;
     @BindView(R.id.tv_progress)
     TextView mTvProgress;
+    @BindView(R.id.container)
+    CoordinatorLayout mContainer;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private AppAdapter myItemAdapter;
@@ -244,6 +248,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             case UNINSTALL_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     myItemAdapter.removeItem(myItemAdapter.getCurrentPosition());
+                    Snackbar.make(mContainer, "卸载成功", Snackbar.LENGTH_SHORT).show();
+                }else {
+                    Snackbar.make(mContainer,"卸载失败",Snackbar.LENGTH_SHORT).show();
                 }
         }
     }

@@ -38,6 +38,7 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConsta
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -178,8 +179,7 @@ public class AppAdapter
 
     @Override
     public void onBindChildViewHolder(MyChildViewHolder holder, final int groupPosition, int childPosition,
-                                      int
-                                              viewType) {
+                                      int viewType) {
         final AppInfo info = mAppInfos.get(groupPosition);
         holder.mTvPackageName.setText(info.getPackageName());
         holder.mTvVersion.setText(info.getVersion());
@@ -211,7 +211,13 @@ public class AppAdapter
         holder.mBtnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(info.getApkPath())));
+                intent.setType("application/vnd.android.package-archive");
+                mContext.startActivity(Intent.createChooser(intent, String.format("发送%s的安装包文件", info
+                        .getLable()
+                )));
+//                mContext.startActivity(intent);
             }
         });
     }
