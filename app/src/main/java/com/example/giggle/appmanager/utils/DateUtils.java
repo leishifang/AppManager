@@ -7,7 +7,10 @@ package com.example.giggle.appmanager.utils;
 public class DateUtils {
 
     public static String convertTimeMill(Long timeMill) {
-        return android.text.format.DateFormat.format("yy/MM/dd hh:mm", timeMill).toString();
+        return android.text.format.DateFormat.format("yy/MM/dd HH:mm:ss", timeMill).toString();
     }
 
+    public static String convertTimeMill(String format, long timeMill) {
+        return android.text.format.DateFormat.format(format, timeMill).toString();
+    }
 }

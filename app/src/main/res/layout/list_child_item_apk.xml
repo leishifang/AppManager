@@ -83,14 +83,14 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btn_launch"
+            android:id="@+id/btn_install"
             style="@style/btn_item_style"
-            android:text="启动" />
+            android:text="安装" />
 
         <Button
-            android:id="@+id/btn_uninstall"
+            android:id="@+id/btn_delete"
             style="@style/btn_item_style"
-            android:text="卸载" />
+            android:text="删除" />
 
         <Button
             android:id="@+id/btn_share"

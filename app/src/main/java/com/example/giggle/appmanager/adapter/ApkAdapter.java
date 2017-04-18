@@ -1,6 +1,7 @@
 package com.example.giggle.appmanager.adapter;
 
 import android.support.annotation.IntRange;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import butterknife.ButterKnife;
 public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupViewHolder, ApkAdapter
         .ChildViewHolder> {
 
+    private static final String TAG = "ApkAdapter";
     private List<ApkInfo> data;
 
     private interface Expandable extends ExpandableItemConstants {
@@ -128,7 +130,8 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
                                       @IntRange(from = -8388608L, to = 8388607L) int viewType) {
         ApkInfo info = data.get(groupPosition);
         holder.mTvVersion.setText(info.getVersionName());
-        holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getTime()));
+        Log.d(TAG, "onBindChildViewHolder: " + info.getTime());
+        holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getTime()*1000));
         holder.mTvApkPath.setText(info.getApkPath());
         holder.mTvPackageName.setText(info.getPackageName());
     }
