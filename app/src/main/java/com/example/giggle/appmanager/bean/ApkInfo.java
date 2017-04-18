@@ -19,6 +19,14 @@ public class ApkInfo extends BaseInfo {
      * 安装包存放路径
      */
     private String apkPath;
+    /**
+     * 安装包版本名
+     */
+    private String versionName;
+    /**
+     * 包名
+     */
+    private String packageName;
 
     public long getSize() {
         return size;
@@ -51,5 +59,21 @@ public class ApkInfo extends BaseInfo {
                 ", time=" + time +
                 ", apkPath='" + apkPath + '\'' +
                 "} " + super.toString();
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 }
