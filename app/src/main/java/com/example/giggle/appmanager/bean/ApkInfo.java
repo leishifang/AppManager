@@ -43,4 +43,13 @@ public class ApkInfo extends BaseInfo {
     public void setApkPath(String apkPath) {
         this.apkPath = apkPath;
     }
+
+    @Override
+    public String toString() {
+        return "ApkInfo{" +
+                "size=" + size +
+                ", time=" + time +
+                ", apkPath='" + apkPath + '\'' +
+                "} " + super.toString();
+    }
 }

@@ -32,4 +32,12 @@ public class BaseInfo {
     public void setIcon(Drawable icon) {
         this.icon = icon;
     }
+
+    @Override
+    public String toString() {
+        return "BaseInfo{" +
+                "lable='" + lable + '\'' +
+                ", icon=" + icon +
+                '}';
+    }
 }
