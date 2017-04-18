@@ -1,13 +1,19 @@
 package com.example.giggle.appmanager.adapter;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.IntRange;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.ApkInfo;
 import com.example.giggle.appmanager.utils.DateUtils;
@@ -16,6 +22,7 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConsta
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,14 +36,17 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         .ChildViewHolder> {
 
     private static final String TAG = "ApkAdapter";
+
     private List<ApkInfo> data;
+    private Context mContext;
 
     private interface Expandable extends ExpandableItemConstants {
 
     }
 
-    public ApkAdapter(List<ApkInfo> apkInfoList) {
+    public ApkAdapter(List<ApkInfo> apkInfoList, Context context) {
         setHasStableIds(true);
+        mContext = context;
         data = apkInfoList;
     }
 
@@ -67,6 +77,12 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         TextView mTvPackageName;
         @BindView(R.id.tv_apk_path)
         TextView mTvApkPath;
+        @BindView(R.id.btn_install)
+        Button mBtnInstall;
+        @BindView(R.id.btn_delete)
+        Button mBtnDelete;
+        @BindView(R.id.btn_share)
+        Button mBtnShare;
 
         public ChildViewHolder(View itemView) {
             super(itemView);
@@ -126,14 +142,58 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
     }
 
     @Override
-    public void onBindChildViewHolder(ChildViewHolder holder, int groupPosition, int childPosition,
+    public void onBindChildViewHolder(ChildViewHolder holder, final int groupPosition, int childPosition,
                                       @IntRange(from = -8388608L, to = 8388607L) int viewType) {
-        ApkInfo info = data.get(groupPosition);
+        final ApkInfo info = data.get(groupPosition);
         holder.mTvVersion.setText(info.getVersionName());
         Log.d(TAG, "onBindChildViewHolder: " + info.getTime());
-        holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getTime()*1000));
+        holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getTime() * 1000));
         holder.mTvApkPath.setText(info.getApkPath());
         holder.mTvPackageName.setText(info.getPackageName());
+        holder.mBtnInstall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setDataAndType(Uri.parse("file://" + info.getApkPath()), "application/vnd.android" +
+                        ".package-archive");
+                MyApplication.getContext().startActivity(intent);
+            }
+        });
+        holder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File file = new File(info.getApkPath());
+                if (file.isFile() && file.exists()) {
+                    if (file.delete()) {
+                        Snackbar.make(view, "删除成功", Snackbar.LENGTH_SHORT).show();
+                        removeItem(groupPosition);
+                    } else {
+                        Snackbar.make(view, "删除失败", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        holder.mBtnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(info.getApkPath())));
+                intent.setType("application/vnd.android.package-archive");
+                mContext.startActivity(Intent.createChooser(intent, String.format
+                        ("发送%s安装包文件", info
+                                .getLable()
+                        )));
+            }
+        });
+    }
+
+    public void removeItem(int groupPosition) {
+        data.remove(groupPosition);
+        //不设置会导致删除项不折叠
+        notifyItemRemoved(groupPosition);
+        //不设置会导致列表顺序错乱
+        notifyDataSetChanged();
     }
 
     @Override

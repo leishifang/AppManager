@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,6 +21,8 @@ import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.adapter.ApkAdapter;
 import com.example.giggle.appmanager.bean.ApkInfo;
 import com.example.giggle.appmanager.utils.PermissionUtils;
+import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -76,7 +77,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PackageManager.PERMISSION_GRANTED != checkSelfPermission
                     (Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             } else {
                 getData();
@@ -115,12 +116,14 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
-        apkAdapter = new ApkAdapter(infos);
-        for (ApkInfo info : infos) {
-            Log.d(TAG, "fillAdapter: "+info.toString());
-        }
+        apkAdapter = new ApkAdapter(infos,this);
+
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
 
+        final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
+        animator.setSupportsChangeAnimations(false);
+        //指示箭头动画
+        mRecyclerView.setItemAnimator(animator);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mWrappedAdapter);
         mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
@@ -164,6 +167,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
                 }
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return apkInfos;
     }
 
