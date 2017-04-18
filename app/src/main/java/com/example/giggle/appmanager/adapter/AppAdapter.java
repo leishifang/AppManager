@@ -32,6 +32,7 @@ import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.AppInfo;
 import com.example.giggle.appmanager.ui.AppListActivity;
+import com.example.giggle.appmanager.ui.BaseExpandableListActivity;
 import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
@@ -157,7 +158,7 @@ public class AppAdapter
     @Override
     public MyGroupViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final View v = inflater.inflate(R.layout.list_group_item_app, parent, false);
+        final View v = inflater.inflate(R.layout.list_group_item, parent, false);
         return new MyGroupViewHolder(v);
     }
 
@@ -208,6 +209,7 @@ public class AppAdapter
                 mContext.startActivityForResult(intent, AppListActivity.UNINSTALL_REQUEST_CODE);
             }
         });
+        // TODO: 2017/4/18 改APK文件名
         holder.mBtnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -252,7 +254,6 @@ public class AppAdapter
     @Override
     public boolean onCheckCanExpandOrCollapseGroup(MyGroupViewHolder holder, int groupPosition, int x, int
             y, boolean expand) {
-
         return true;
     }
 }

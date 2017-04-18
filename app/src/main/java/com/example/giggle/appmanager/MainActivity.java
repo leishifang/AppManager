@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.example.giggle.appmanager.ui.ApkListActivity;
 import com.example.giggle.appmanager.ui.AppListActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     CircleProgressBar mProgressMemory;
     @BindView(R.id.btn_app)
     RelativeLayout mBtnApp;
+    @BindView(R.id.btn_apk)
+    RelativeLayout mBtnApk;
+    @BindView(R.id.btn_processes)
+    RelativeLayout mBtnProcesses;
     /**
      * 已使用的内存百分比
      */
@@ -41,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         initView();
 
@@ -58,6 +62,23 @@ public class MainActivity extends AppCompatActivity {
                         updateMemoryState();
                     }
                 });
+    }
+
+    private void initView() {
+        mBtnApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), AppListActivity.class);
+                startActivity(intent);
+            }
+        });
+        mBtnApk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ApkListActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void updateMemoryState() {
@@ -101,15 +122,5 @@ public class MainActivity extends AppCompatActivity {
     private boolean getExternalStorageState() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
                 && Environment.isExternalStorageRemovable();
-    }
-
-    private void initView() {
-        mBtnApp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), AppListActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 }

@@ -6,18 +6,18 @@ import android.graphics.drawable.Drawable;
  * Created by leishifang on 2017/3/21 14:33.
  */
 
-public class AppInfo {
+public class AppInfo extends BaseInfo {
 
     /**
      * 应用名
      */
-    private String lable;
+//    private String lable;
     /**
      * 包名
      */
     private String packageName;
     private String versionName;
-    private Drawable icon;
+//    private Drawable icon;
     /**
      * 应用占用空间 cace+code+data
      */
@@ -52,6 +52,7 @@ public class AppInfo {
         this.apkPath = apkPath;
         this.isSystem = isSystem;
     }
+/*
 
     public String getLable() {
         return lable;
@@ -60,6 +61,7 @@ public class AppInfo {
     public void setLable(String lable) {
         this.lable = lable;
     }
+*/
 
     public String getPackageName() {
         return packageName;
@@ -93,13 +95,14 @@ public class AppInfo {
         this.lastUpdateTime = lastUpdateTime;
     }
 
-    public Drawable getIcon() {
+   /* public Drawable getIcon() {
         return icon;
     }
 
     public void setIcon(Drawable icon) {
         this.icon = icon;
     }
+    */
 
     public long getSize() {
         return size;

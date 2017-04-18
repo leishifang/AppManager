@@ -25,5 +25,9 @@
             android:name=".ui.AppListActivity"
             android:label="@string/app_manager"
             android:theme="@style/AppThemeBase" />
+        <activity
+            android:name=".ui.ApkListActivity"
+            android:label="安装包管理"
+            android:theme="@style/AppThemeBase" />
     </application>
 </manifest>

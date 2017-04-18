@@ -73,7 +73,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_layout_app);
+        setContentView(R.layout.list_layout);
 
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -249,8 +249,8 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 if (resultCode == RESULT_OK) {
                     myItemAdapter.removeItem(myItemAdapter.getCurrentPosition());
                     Snackbar.make(mContainer, "卸载成功", Snackbar.LENGTH_SHORT).show();
-                }else {
-                    Snackbar.make(mContainer,"卸载失败",Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(mContainer, "卸载失败", Snackbar.LENGTH_SHORT).show();
                 }
         }
     }
