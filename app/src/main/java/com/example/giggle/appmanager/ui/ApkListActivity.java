@@ -121,6 +121,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
             mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
             mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
             mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
+
             apkAdapter = new ApkAdapter(infos, this);
 
             mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);

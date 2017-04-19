@@ -13,17 +13,16 @@
        See the License for the specific language governing permissions and
        limitations under the License.
 --><!-- NOTE: should use FrameLayout or RelativeLayout for parent of the "@id/container" view (for Android 2.3 compatibility) -->
-<FrameLayout android:id="@+id/container"
-    style="@style/commonListItemStyle"
+<FrameLayout style="@style/commonListItemStyle"
+    android:id="@+id/container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_group_item_height"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
     android:layout_marginTop="8dp"
     android:clickable="true"
     android:foreground="?attr/selectableItemBackground"
+    android:paddingRight="0dp"
     tools:ignore="UselessParent">
 
     <com.example.giggle.appmanager.widget.ExpandableItemIndicator

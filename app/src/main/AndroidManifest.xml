@@ -31,5 +31,9 @@
             android:name=".ui.ApkListActivity"
             android:label="安装包管理"
             android:theme="@style/AppThemeBase" />
+        <activity
+            android:name=".ui.ProcessActivity"
+            android:label="进程清理"
+            android:theme="@style/AppThemeBase" />
     </application>
 </manifest>

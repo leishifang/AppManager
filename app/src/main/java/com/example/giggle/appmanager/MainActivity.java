@@ -2,23 +2,19 @@ package com.example.giggle.appmanager;
 
 import android.animation.ValueAnimator;
 import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.example.giggle.appmanager.ui.ApkListActivity;
 import com.example.giggle.appmanager.ui.AppListActivity;
-import com.jaredrummler.android.processes.AndroidProcesses;
-import com.jaredrummler.android.processes.models.AndroidAppProcess;
+import com.example.giggle.appmanager.ui.ProcessActivity;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -88,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
         mBtnProcesses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(getApplicationContext(), ProcessActivity.class);
+                startActivity(intent);
             }
         });
     }

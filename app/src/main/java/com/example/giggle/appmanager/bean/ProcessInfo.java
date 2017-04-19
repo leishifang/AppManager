@@ -6,6 +6,8 @@ package com.example.giggle.appmanager.bean;
 
 public class ProcessInfo extends BaseInfo {
 
+    private int pid;
+
     private String processName;
 
     public String getProcessName() {
@@ -14,5 +16,13 @@ public class ProcessInfo extends BaseInfo {
 
     public void setProcessName(String processName) {
         this.processName = processName;
+    }
+
+    public int getPid() {
+        return pid;
+    }
+
+    public void setPid(int pid) {
+        this.pid = pid;
     }
 }
