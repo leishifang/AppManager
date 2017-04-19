@@ -53,6 +53,8 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
     AVLoadingIndicatorView mImgLoading;
     @BindView(R.id.tv_progress)
     TextView mTvProgress;
+    @BindView(R.id.tv_empty)
+    TextView mTvEmpty;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
@@ -112,22 +114,26 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
     }
 
     private void fillAdapter(List<ApkInfo> infos) {
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
-        mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
-        mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
-        apkAdapter = new ApkAdapter(infos,this);
+        if (infos.size() <= 0) {
+            mTvEmpty.setVisibility(View.VISIBLE);
+        } else {
+            mLayoutManager = new LinearLayoutManager(this);
+            mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
+            mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
+            mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
+            apkAdapter = new ApkAdapter(infos, this);
 
-        mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
+            mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
 
-        final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
-        animator.setSupportsChangeAnimations(false);
-        //指示箭头动画
-        mRecyclerView.setItemAnimator(animator);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mWrappedAdapter);
-        mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
-
+            final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
+            animator.setSupportsChangeAnimations(false);
+            //指示箭头动画
+            mRecyclerView.setItemAnimator(animator);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(mWrappedAdapter);
+            mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
+            mTvEmpty.setVisibility(View.GONE);
+        }
         hideProgress();
     }
 
@@ -157,7 +163,8 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
                     apkInfo.setSize(cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)));
                     apkInfo.setTime(cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns
                             .DATE_MODIFIED)));
-//                    apkInfo.setLable(cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.TITLE)));
+//                    apkInfo.setLable(cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns
+// .TITLE)));
                     apkInfo.setLable(packageInfo.applicationInfo.loadLabel(pm).toString());
                     apkInfo.setVersionName(packageInfo.versionName);
                     apkInfo.setPackageName(packageInfo.packageName);

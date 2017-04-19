@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout style="@style/commonListItemStyle"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
-    android:background="@color/white"
-    android:elevation="2dp"
     android:orientation="vertical"
-    android:paddingBottom="8dp"
-    android:paddingLeft="@dimen/left_padding">
+    android:paddingBottom="8dp">
 
     <LinearLayout
         android:layout_width="wrap_content"

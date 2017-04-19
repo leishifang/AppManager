@@ -22,10 +22,8 @@
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
     android:layout_marginTop="8dp"
-    android:background="#ffffff"
     android:clickable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:paddingLeft="@dimen/left_padding"
     tools:ignore="UselessParent">
 
     <com.example.giggle.appmanager.widget.ExpandableItemIndicator

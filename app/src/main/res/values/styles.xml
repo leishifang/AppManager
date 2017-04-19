@@ -22,6 +22,8 @@
     <style name="commonListItemStyle">
         <item name="android:elevation">@dimen/list_item_elevation</item>
         <item name="android:outlineProvider">bounds</item>
+        <item name="android:paddingLeft">@dimen/left_padding</item>
+        <item name="android:background">@color/white</item>
     </style>
 
     <style name="btn_item_style">
