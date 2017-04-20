@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.giggle.appmanager.R;
-import com.example.giggle.appmanager.adapter.SwipeableExampleAdapter;
+import com.example.giggle.appmanager.adapter.ProcessesAdapter;
 import com.example.giggle.appmanager.bean.ProcessInfo;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
@@ -131,7 +131,7 @@ public class ProcessActivity extends AppCompatActivity {
 
             mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
 
-            mAdapter = new SwipeableExampleAdapter(infos);
+            mAdapter = new ProcessesAdapter(infos);
             mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mAdapter);
 
             final GeneralItemAnimator animator = new SwipeDismissItemAnimator();

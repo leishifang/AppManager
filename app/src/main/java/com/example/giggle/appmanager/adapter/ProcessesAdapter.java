@@ -1,3 +1,19 @@
+/*
+ *    Copyright (C) 2015 Haruki Hasegawa
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.example.giggle.appmanager.adapter;
 
 import android.support.v7.widget.RecyclerView;
@@ -5,8 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.giggle.appmanager.R;
@@ -14,6 +30,7 @@ import com.example.giggle.appmanager.bean.ProcessInfo;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionMoveToSwipedDirection;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 
 import java.util.List;
@@ -21,23 +38,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by leishifang on 2017/4/19 18:48.
- */
+public class ProcessesAdapter
+        extends RecyclerView.Adapter<ProcessesAdapter.MyViewHolder>
+        implements SwipeableItemAdapter<ProcessesAdapter.MyViewHolder> {
 
-public class ProcessesAdapter extends RecyclerView.Adapter<ProcessesAdapter.MyViewHolder> implements
-        SwipeableItemAdapter<ProcessesAdapter.MyViewHolder> {
-
-    private static final String TAG = "ProcessesAdapter";
+    private static final String TAG = "MySwipeableItemAdapter";
 
     private List<ProcessInfo> mInfos;
 
-    public ProcessesAdapter(List<ProcessInfo> infos) {
-        setHasStableIds(true);
-        mInfos = infos;
-    }
-
     public static class MyViewHolder extends AbstractSwipeableItemViewHolder {
+
+        public LinearLayout mContainer;
 
         @BindView(R.id.img_icon)
         ImageView mImgIcon;
@@ -46,34 +57,47 @@ public class ProcessesAdapter extends RecyclerView.Adapter<ProcessesAdapter.MyVi
         @BindView(R.id.tv_process_name)
         TextView mTvProcessName;
 
-        public FrameLayout mContainerProcess;
-
-        public MyViewHolder(View itemView) {
-            super(itemView);
-            mContainerProcess = (FrameLayout) itemView.findViewById(R.id.container_process);
-            ButterKnife.bind(this, itemView);
+        public MyViewHolder(View v) {
+            super(v);
+            mContainer = (LinearLayout) v.findViewById(R.id.container_p);
+            ButterKnife.bind(this, v);
         }
 
         @Override
         public View getSwipeableContainerView() {
-            return mContainerProcess;
+            return mContainer;
         }
+    }
+
+    public ProcessesAdapter(List<ProcessInfo> data) {
+        mInfos = data;
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mInfos.get(position).getPid();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return 0;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View rootView = inflater.inflate(R.layout.list_item_process, parent, false);
-        return new MyViewHolder(rootView);
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final View v = inflater.inflate(R.layout.list_item_process, parent, false);
+        return new MyViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        ProcessInfo info = mInfos.get(position);
-        holder.mImgIcon.setImageDrawable(info.getIcon());
-        holder.mTvAppName.setText(info.getLable());
-        holder.mTvProcessName.setText(info.getProcessName());
-        // set swiping properties
+        final ProcessInfo item = mInfos.get(position);
+
+        holder.mImgIcon.setImageDrawable(item.getIcon());
+        holder.mTvProcessName.setText(item.getProcessName());
+        holder.mTvAppName.setText(item.getLable());
         holder.setSwipeItemHorizontalSlideAmount(0);
     }
 
@@ -84,7 +108,7 @@ public class ProcessesAdapter extends RecyclerView.Adapter<ProcessesAdapter.MyVi
 
     @Override
     public int onGetSwipeReactionType(MyViewHolder holder, int position, int x, int y) {
-        return SwipeableItemConstants.REACTION_CAN_SWIPE_RIGHT;
+        return SwipeableItemConstants.REACTION_CAN_SWIPE_BOTH_H;
     }
 
     @Override
@@ -93,8 +117,42 @@ public class ProcessesAdapter extends RecyclerView.Adapter<ProcessesAdapter.MyVi
     }
 
     @Override
-    public SwipeResultAction onSwipeItem(MyViewHolder holder, int position, int result) {
-        Log.d(TAG, "onSwipeItem: " + position);
+    public SwipeResultAction onSwipeItem(MyViewHolder holder, final int position, int result) {
+        Log.d(TAG, "onSwipeItem(position = " + position + ", result = " + result + ")");
+        if (result == SwipeableItemConstants.RESULT_SWIPED_LEFT || result == SwipeableItemConstants
+                .RESULT_SWIPED_RIGHT) {
+            return new SwipeLeftAndRightResultAction(this, position);
+        }
         return null;
+    }
+
+    private static class SwipeLeftAndRightResultAction extends SwipeResultActionMoveToSwipedDirection {
+
+        private ProcessesAdapter mAdapter;
+        private final int mPosition;
+
+        SwipeLeftAndRightResultAction(ProcessesAdapter adapter, int position) {
+            mAdapter = adapter;
+            mPosition = position;
+        }
+
+        @Override
+        protected void onPerformAction() {
+            super.onPerformAction();
+            mAdapter.mInfos.remove(mPosition);
+            mAdapter.notifyItemRemoved(mPosition);
+        }
+
+        @Override
+        protected void onSlideAnimationEnd() {
+            super.onSlideAnimationEnd();
+        }
+
+        @Override
+        protected void onCleanUp() {
+            super.onCleanUp();
+            // clear the references
+            mAdapter = null;
+        }
     }
 }
