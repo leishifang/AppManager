@@ -44,7 +44,13 @@ public class ProcessesAdapter
 
     private static final String TAG = "MySwipeableItemAdapter";
 
+    private EventListener mEventListener;
     private List<ProcessInfo> mInfos;
+
+    public interface EventListener {
+
+        void onLeftAndRighMoved(String pckName);
+    }
 
     public static class MyViewHolder extends AbstractSwipeableItemViewHolder {
 
@@ -72,6 +78,14 @@ public class ProcessesAdapter
     public ProcessesAdapter(List<ProcessInfo> data) {
         mInfos = data;
         setHasStableIds(true);
+    }
+
+    public void setEventListener(EventListener e) {
+        mEventListener = e;
+    }
+
+    public EventListener getEventListener(EventListener e) {
+        return mEventListener;
     }
 
     @Override
@@ -118,7 +132,6 @@ public class ProcessesAdapter
 
     @Override
     public SwipeResultAction onSwipeItem(MyViewHolder holder, final int position, int result) {
-        Log.d(TAG, "onSwipeItem(position = " + position + ", result = " + result + ")");
         if (result == SwipeableItemConstants.RESULT_SWIPED_LEFT || result == SwipeableItemConstants
                 .RESULT_SWIPED_RIGHT) {
             return new SwipeLeftAndRightResultAction(this, position);
@@ -139,8 +152,11 @@ public class ProcessesAdapter
         @Override
         protected void onPerformAction() {
             super.onPerformAction();
-            mAdapter.mInfos.remove(mPosition);
-            mAdapter.notifyItemRemoved(mPosition);
+            if (mAdapter.mEventListener != null) {
+                mAdapter.mEventListener.onLeftAndRighMoved(mAdapter.mInfos.get(mPosition).getPackageName());
+                mAdapter.mInfos.remove(mPosition);
+                mAdapter.notifyItemRemoved(mPosition);
+            }
         }
 
         @Override

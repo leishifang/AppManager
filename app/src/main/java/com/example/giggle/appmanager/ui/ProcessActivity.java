@@ -1,5 +1,7 @@
 package com.example.giggle.appmanager.ui;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -58,6 +61,8 @@ public class ProcessActivity extends AppCompatActivity {
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewSwipeManager mRecyclerViewSwipeManager;
 
+    private ActivityManager mActivityManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +77,8 @@ public class ProcessActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         Observable.create(new ObservableOnSubscribe<List<ProcessInfo>>() {
             @Override
@@ -107,8 +114,8 @@ public class ProcessActivity extends AppCompatActivity {
                 info.setIcon(applicationInfo.loadIcon(packageManager));
                 info.setProcessName(process.name);
                 info.setPid(process.pid);
+                info.setPackageName(applicationInfo.packageName);
                 infos.add(info);
-
                 count++;
                 updateProgress(count);
             } catch (PackageManager.NameNotFoundException e) {
@@ -119,6 +126,7 @@ public class ProcessActivity extends AppCompatActivity {
     }
 
     private void fillAdapter(List<ProcessInfo> infos) {
+
         if (infos.size() <= 0) {
             mTvEmpty.setVisibility(View.VISIBLE);
         } else {
@@ -131,7 +139,15 @@ public class ProcessActivity extends AppCompatActivity {
 
             mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
 
-            mAdapter = new ProcessesAdapter(infos);
+            ProcessesAdapter processesAdapter = new ProcessesAdapter(infos);
+            processesAdapter.setEventListener(new ProcessesAdapter.EventListener() {
+                @Override
+                public void onLeftAndRighMoved(String pckName) {
+                    Log.d(TAG, "onLeftAndRighMoved: " + pckName);
+                    mActivityManager.killBackgroundProcesses(pckName);
+                }
+            });
+            mAdapter = processesAdapter;
             mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mAdapter);
 
             final GeneralItemAnimator animator = new SwipeDismissItemAnimator();
