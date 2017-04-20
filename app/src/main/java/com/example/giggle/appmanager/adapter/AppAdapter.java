@@ -70,9 +70,7 @@ public class AppAdapter
             protected FilterResults performFiltering(CharSequence charSequence) {
                 FilterResults filterResults = new FilterResults();
                 List<AppInfo> result = new ArrayList<>();
-                if (mAllInfos == null) {
-                    mAllInfos = mAppInfos;
-                }
+
                 for (AppInfo appInfo : mAllInfos) {
                     if (appInfo.getLable().toLowerCase().contains(charSequence)) {
                         result.add(appInfo);
@@ -148,6 +146,7 @@ public class AppAdapter
     public AppAdapter(List<AppInfo> infos, Activity context, EventListener e) {
         this();
         this.mAppInfos = infos;
+        this.mAllInfos = infos;
         mContext = context;
         mEventListener = e;
         getEventListener().updataAppCount(mAppInfos.size());
@@ -164,6 +163,7 @@ public class AppAdapter
     public void setData(List<AppInfo> infos) {
         //mAppInfos.clear();
         mAppInfos = infos;
+        mAllInfos = infos;
         notifyDataSetChanged();
         getEventListener().updataAppCount(mAppInfos.size());
     }
