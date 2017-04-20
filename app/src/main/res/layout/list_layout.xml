@@ -8,11 +8,11 @@
 
     <TextView
         android:id="@+id/tv_empty"
-        android:layout_gravity="center"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="列表为空" />
+        android:layout_gravity="center"
+        android:text="列表为空"
+        android:visibility="gone" />
 
     <include layout="@layout/toolbar" />
 
@@ -32,8 +32,8 @@
         android:orientation="vertical">
 
         <com.wang.avi.AVLoadingIndicatorView
-            android:id="@+id/img_loading"
             style="@style/AVLoadingIndicatorView.Large"
+            android:id="@+id/img_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:indicatorColor="@color/colorPrimary"

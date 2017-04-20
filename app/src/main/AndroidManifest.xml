@@ -25,15 +25,12 @@
         </activity>
         <activity
             android:name=".ui.AppListActivity"
-            android:label="@string/app_manager"
-            android:theme="@style/AppThemeBase" />
+            android:label="@string/app_manager" />
         <activity
             android:name=".ui.ApkListActivity"
-            android:label="安装包管理"
-            android:theme="@style/AppThemeBase" />
+            android:label="安装包管理" />
         <activity
             android:name=".ui.ProcessActivity"
-            android:label="进程清理"
-            android:theme="@style/AppThemeBase" />
+            android:label="进程清理" />
     </application>
 </manifest>

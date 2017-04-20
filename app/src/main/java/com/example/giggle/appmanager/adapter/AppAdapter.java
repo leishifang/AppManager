@@ -32,7 +32,6 @@ import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.AppInfo;
 import com.example.giggle.appmanager.ui.AppListActivity;
-import com.example.giggle.appmanager.ui.BaseExpandableListActivity;
 import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
@@ -56,6 +55,12 @@ public class AppAdapter
      * 卸载应用的position
      */
     private int currentPosition;
+    private EventListener mEventListener;
+
+    public interface EventListener {
+
+        void updataAppCount(int count);
+    }
 
     private interface Expandable extends ExpandableItemConstants {
 
@@ -106,15 +111,26 @@ public class AppAdapter
         setHasStableIds(true);
     }
 
-    public AppAdapter(List<AppInfo> infos, Activity context) {
+    public AppAdapter(List<AppInfo> infos, Activity context,EventListener e) {
         this();
         this.mAppInfos = infos;
         mContext = context;
+        mEventListener = e;
+        getEventListener().updataAppCount(mAppInfos.size());
+    }
+
+    public void setEventListener(EventListener eventListener) {
+        mEventListener = eventListener;
+    }
+
+    public EventListener getEventListener() {
+        return mEventListener;
     }
 
     public void setData(List<AppInfo> infos) {
         mAppInfos = infos;
         notifyDataSetChanged();
+        getEventListener().updataAppCount(mAppInfos.size());
     }
 
     @Override
@@ -231,6 +247,7 @@ public class AppAdapter
         notifyItemRemoved(groupPosition);
         //不设置会导致列表顺序错乱
         notifyDataSetChanged();
+        getEventListener().updataAppCount(mAppInfos.size());
     }
 
     private void updateIndicatorState(MyGroupViewHolder holder) {

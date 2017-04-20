@@ -84,7 +84,7 @@ public class ProcessesAdapter
         mEventListener = e;
     }
 
-    public EventListener getEventListener(EventListener e) {
+    public EventListener getEventListener() {
         return mEventListener;
     }
 

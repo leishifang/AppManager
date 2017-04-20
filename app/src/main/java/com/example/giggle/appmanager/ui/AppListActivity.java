@@ -69,6 +69,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private AppAdapter myItemAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
+    Toolbar mToolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,10 +77,10 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         setContentView(R.layout.list_layout);
 
         ButterKnife.bind(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -106,6 +107,10 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                         setAppList(appInfos);
                     }
                 });
+    }
+
+    public void updateSubTitle(int appCount) {
+        mToolbar.setSubtitle(String.format("共有%d个应用", appCount));
     }
 
     private List<AppInfo> getInfo() {
@@ -166,8 +171,15 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
         mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
 
+        AppAdapter appAdapter = new AppAdapter(infos, this, new AppAdapter.EventListener() {
+            @Override
+            public void updataAppCount(int count) {
+                updateSubTitle(count);
+            }
+        });
+
         //adapter
-        myItemAdapter = new AppAdapter(infos, this);
+        myItemAdapter = appAdapter;
 
         mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(myItemAdapter);       //
         // wrap for expanding
@@ -187,7 +199,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     }
 
     private void updateProgress(final int progress, final int total) {
-
         mTvProgress.post(new Runnable() {
             @Override
             public void run() {

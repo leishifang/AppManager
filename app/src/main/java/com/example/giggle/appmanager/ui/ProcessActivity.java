@@ -77,7 +77,6 @@ public class ProcessActivity extends AppCompatActivity {
                 finish();
             }
         });
-
         mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         Observable.create(new ObservableOnSubscribe<List<ProcessInfo>>() {
