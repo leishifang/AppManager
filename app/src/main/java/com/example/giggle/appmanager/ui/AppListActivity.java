@@ -18,6 +18,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -69,7 +71,29 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private AppAdapter myItemAdapter;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
+
+    List<AppInfo> mAppInfosAll;
+
     Toolbar mToolbar;
+
+    private Toolbar.OnMenuItemClickListener mOnMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_system:
+                    myItemAdapter.setData(getInfo(1));
+                    break;
+                case R.id.action_user:
+                    myItemAdapter.setData(getInfo(2));
+                    break;
+                case R.id.action_all:
+                    myItemAdapter.setData(getInfo(0));
+                    break;
+            }
+            mRecyclerView.scrollToPosition(0);
+            return true;
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,16 +101,11 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
         setContentView(R.layout.list_layout);
 
         ButterKnife.bind(this);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+
+        initView();
+
         showProgress();
+
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable
                 (SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
@@ -109,8 +128,59 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 });
     }
 
+    private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        mToolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+    }
+
     public void updateSubTitle(int appCount) {
-        mToolbar.setSubtitle(String.format("共有%d个应用", appCount));
+        mToolbar.setSubtitle(String.format("共有%d个", appCount));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    /**
+     * @param type 0:获取所有应用 1：获取系统应用 2：获取用户应用
+     * @return
+     */
+    private List<AppInfo> getInfo(int type) {
+        List<AppInfo> infos = new ArrayList<>();
+        switch (type) {
+            case 0:
+                return mAppInfosAll;
+            case 1:
+                for (AppInfo info : mAppInfosAll) {
+                    if (info.isSys()) {
+                        Log.d(TAG, "getInfo: " + info.getLable());
+                        infos.add(info);
+                    }
+                }
+                break;
+            case 2:
+                for (AppInfo info : mAppInfosAll) {
+                    if (!info.isSys()) {
+                        Log.d(TAG, "getInfo: " + info.getLable());
+                        infos.add(info);
+                    }
+                }
+                break;
+            default:
+                return null;
+        }
+
+        return infos;
     }
 
     private List<AppInfo> getInfo() {
@@ -164,6 +234,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 return info.getLable().compareTo(t1.getLable());
             }
         });
+        mAppInfosAll = appInfos;
         return appInfos;
     }
 
@@ -263,6 +334,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 } else {
                     Snackbar.make(mContainer, "卸载失败", Snackbar.LENGTH_SHORT).show();
                 }
+                break;
         }
     }
 }

@@ -81,7 +81,6 @@ public class AppAdapter
             sizeTextView = (TextView) v.findViewById(R.id.tv_size);
         }
     }
-
     public static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
 
         @BindView(R.id.tv_package_name)
@@ -128,6 +127,7 @@ public class AppAdapter
     }
 
     public void setData(List<AppInfo> infos) {
+        //mAppInfos.clear();
         mAppInfos = infos;
         notifyDataSetChanged();
         getEventListener().updataAppCount(mAppInfos.size());

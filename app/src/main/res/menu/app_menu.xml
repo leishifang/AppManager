@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_system"
-        android:title="系统应用" />
+        android:id="@+id/ab_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_all"
+        android:title="所有应用"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_user"
-        android:title="用户应用" />
+        android:title="用户应用"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_system"
+        android:title="系统应用"
+        app:showAsAction="never" />
+
 </menu>

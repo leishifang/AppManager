@@ -9,15 +9,11 @@ import android.graphics.drawable.Drawable;
 public class AppInfo extends BaseInfo {
 
     /**
-     * 应用名
-     */
-//    private String lable;
-    /**
      * 包名
      */
     private String packageName;
     private String versionName;
-//    private Drawable icon;
+
     /**
      * 应用占用空间 cace+code+data
      */
@@ -35,10 +31,19 @@ public class AppInfo extends BaseInfo {
      * Full path to the base APK for this application
      */
     private String apkPath;
+
+    public boolean isSys() {
+        return isSys;
+    }
+
+    public void setSys(boolean sys) {
+        isSys = sys;
+    }
+
     /**
      * 是否是系统应用
      */
-    private boolean isSystem;
+    private boolean isSys;
 
     public AppInfo(String lable, String packageName, String versionName, Drawable icon, long size, long
             firstInstallTime, long lastUpdateTime, String apkPath, boolean isSystem) {
@@ -50,18 +55,16 @@ public class AppInfo extends BaseInfo {
         this.firstInstallTime = firstInstallTime;
         this.lastUpdateTime = lastUpdateTime;
         this.apkPath = apkPath;
-        this.isSystem = isSystem;
-    }
-/*
-
-    public String getLable() {
-        return lable;
+        this.isSys = isSystem;
     }
 
-    public void setLable(String lable) {
-        this.lable = lable;
+    public String getVersionName() {
+        return versionName;
     }
-*/
+
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
+    }
 
     public String getPackageName() {
         return packageName;
@@ -95,21 +98,12 @@ public class AppInfo extends BaseInfo {
         this.lastUpdateTime = lastUpdateTime;
     }
 
-   /* public Drawable getIcon() {
-        return icon;
+    public void setSize(long size) {
+        this.size = size;
     }
-
-    public void setIcon(Drawable icon) {
-        this.icon = icon;
-    }
-    */
 
     public long getSize() {
         return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
     }
 
     public String getApkPath() {
