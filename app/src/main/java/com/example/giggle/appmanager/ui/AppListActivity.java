@@ -13,9 +13,11 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -66,6 +68,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     TextView mTvProgress;
     @BindView(R.id.container)
     CoordinatorLayout mContainer;
+
+    private MenuItem mSearchItem;
+    private SearchView mSearchView;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private AppAdapter myItemAdapter;
@@ -148,6 +153,21 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
+
+        mSearchItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                myItemAdapter.getFilter().filter(newText.toLowerCase());
+                return false;
+            }
+        });
         return true;
     }
 

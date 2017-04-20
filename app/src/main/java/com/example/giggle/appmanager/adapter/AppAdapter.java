@@ -25,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +41,7 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAda
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,16 +49,47 @@ import butterknife.ButterKnife;
 
 public class AppAdapter
         extends AbstractExpandableItemAdapter<AppAdapter.MyGroupViewHolder,
-        AppAdapter.MyChildViewHolder> {
+        AppAdapter.MyChildViewHolder> implements Filterable {
 
     private static final String TAG = "AppAdapter";
+
     private List<AppInfo> mAppInfos;
+    private List<AppInfo> mAllInfos;
+
     private Activity mContext;
     /**
      * 卸载应用的position
      */
     private int currentPosition;
     private EventListener mEventListener;
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                FilterResults filterResults = new FilterResults();
+                List<AppInfo> result = new ArrayList<>();
+                if (mAllInfos == null) {
+                    mAllInfos = mAppInfos;
+                }
+                for (AppInfo appInfo : mAllInfos) {
+                    if (appInfo.getLable().toLowerCase().contains(charSequence)) {
+                        result.add(appInfo);
+                    }
+                }
+                filterResults.values = result;
+                filterResults.count = result.size();
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mAppInfos = (List<AppInfo>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
 
     public interface EventListener {
 
@@ -81,6 +115,7 @@ public class AppAdapter
             sizeTextView = (TextView) v.findViewById(R.id.tv_size);
         }
     }
+
     public static class MyChildViewHolder extends AbstractExpandableItemViewHolder {
 
         @BindView(R.id.tv_package_name)
@@ -110,7 +145,7 @@ public class AppAdapter
         setHasStableIds(true);
     }
 
-    public AppAdapter(List<AppInfo> infos, Activity context,EventListener e) {
+    public AppAdapter(List<AppInfo> infos, Activity context, EventListener e) {
         this();
         this.mAppInfos = infos;
         mContext = context;
