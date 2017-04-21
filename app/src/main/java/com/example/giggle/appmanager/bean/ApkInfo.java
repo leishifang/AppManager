@@ -27,6 +27,18 @@ public class ApkInfo extends BaseInfo {
      * 包名
      */
     private String packageName;
+    /**
+     * ID 在apkAdapter中swipe功能getGroupId方法使用
+     */
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public long getSize() {
         return size;

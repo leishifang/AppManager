@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.IntRange;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +22,10 @@ import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemViewHolder;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableSwipeableItemAdapter;
+import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionMoveToSwipedDirection;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
@@ -46,49 +48,49 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
 
     private List<ApkInfo> data;
     private Context mContext;
+    private final RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
 
-    @Override
-    public SwipeResultAction onSwipeGroupItem(GroupViewHolder holder, int groupPosition, int result) {
-        Log.d(TAG, "onSwipeGroupItem: " + groupPosition);
-        return null;
+    private class MyLeftAndRightSwipeResultAction extends SwipeResultActionMoveToSwipedDirection {
+
+        private final int mGroupPosition;
+        private ApkAdapter mAdapter;
+        private RecyclerView.ViewHolder mViewHolder;
+
+        public MyLeftAndRightSwipeResultAction(ApkAdapter adapter, int position, RecyclerView.ViewHolder
+                viewHolder) {
+            this.mGroupPosition = position;
+            this.mAdapter = adapter;
+            this.mViewHolder = viewHolder;
+        }
+
+        @Override
+        protected void onPerformAction() {
+            super.onPerformAction();
+            File file = new File(mAdapter.data.get(mGroupPosition).getApkPath());
+            if (file.isFile() && file.exists()) {
+                if (file.delete()) {
+                    Snackbar.make(mViewHolder.itemView, mAdapter.data.get(mGroupPosition).getLable() +
+                            "删除成功", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(mViewHolder.itemView, mAdapter.data.get(mGroupPosition).getLable() +
+                            "删除失败", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+            mAdapter.data.remove(mGroupPosition);
+            mAdapter.mRecyclerViewExpandableItemManager.notifyGroupItemRemoved(mGroupPosition);
+        }
+
+        @Override
+        protected void onCleanUp() {
+            super.onCleanUp();
+        }
     }
 
-    @Override
-    public SwipeResultAction onSwipeChildItem(ChildViewHolder holder, int groupPosition, int childPosition,
-                                              int result) {
-        return null;
-    }
-
-    @Override
-    public int onGetGroupItemSwipeReactionType(GroupViewHolder holder, int groupPosition, int x, int y) {
-        return SwipeableItemConstants.REACTION_CAN_SWIPE_BOTH_H;
-    }
-
-    @Override
-    public int onGetChildItemSwipeReactionType(ChildViewHolder holder, int groupPosition, int
-            childPosition, int x, int y) {
-        return SwipeableItemConstants.REACTION_CAN_NOT_SWIPE_ANY;
-    }
-
-    @Override
-    public void onSetGroupItemSwipeBackground(GroupViewHolder holder, int groupPosition, int type) {
-
-    }
-
-    @Override
-    public void onSetChildItemSwipeBackground(ChildViewHolder holder, int groupPosition, int childPosition,
-                                              int type) {
-
-    }
-
-    private interface Expandable extends ExpandableItemConstants {
-
-    }
-
-    public ApkAdapter(List<ApkInfo> apkInfoList, Context context) {
+    public ApkAdapter(List<ApkInfo> apkInfoList, RecyclerViewExpandableItemManager manager, Context context) {
         setHasStableIds(true);
         mContext = context;
-        data = apkInfoList;
+        setData(apkInfoList);
+        mRecyclerViewExpandableItemManager = manager;
     }
 
     public static class GroupViewHolder extends AbstractSwipeableItemViewHolder implements
@@ -128,6 +130,43 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         }
     }
 
+    @Override
+    public SwipeResultAction onSwipeGroupItem(GroupViewHolder holder, int groupPosition, int result) {
+        if (result == SwipeableItemConstants.RESULT_SWIPED_LEFT || result == SwipeableItemConstants
+                .RESULT_SWIPED_RIGHT) {
+            return new MyLeftAndRightSwipeResultAction(this, groupPosition, holder);
+        }
+        return null;
+    }
+
+    @Override
+    public SwipeResultAction onSwipeChildItem(ChildViewHolder holder, int groupPosition, int childPosition,
+                                              int result) {
+        return null;
+    }
+
+    @Override
+    public int onGetGroupItemSwipeReactionType(GroupViewHolder holder, int groupPosition, int x, int y) {
+        return SwipeableItemConstants.REACTION_CAN_SWIPE_BOTH_H;
+    }
+
+    @Override
+    public int onGetChildItemSwipeReactionType(ChildViewHolder holder, int groupPosition, int
+            childPosition, int x, int y) {
+        return SwipeableItemConstants.REACTION_CAN_NOT_SWIPE_ANY;
+    }
+
+    @Override
+    public void onSetGroupItemSwipeBackground(GroupViewHolder holder, int groupPosition, int type) {
+
+    }
+
+    @Override
+    public void onSetChildItemSwipeBackground(ChildViewHolder holder, int groupPosition, int childPosition,
+                                              int type) {
+
+    }
+
     public static class ChildViewHolder extends AbstractExpandableItemViewHolder {
 
         @BindView(R.id.tv_update_time)
@@ -156,6 +195,10 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         notifyDataSetChanged();
     }
 
+    public List<ApkInfo> getData() {
+        return data;
+    }
+
     @Override
     public int getGroupCount() {
         return data.size();
@@ -168,7 +211,7 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
 
     @Override
     public long getGroupId(int groupPosition) {
-        return groupPosition;
+        return data.get(groupPosition).getId();
     }
 
     @Override
@@ -207,7 +250,6 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
                                       @IntRange(from = -8388608L, to = 8388607L) int viewType) {
         final ApkInfo info = data.get(groupPosition);
         holder.mTvVersion.setText(info.getVersionName());
-        Log.d(TAG, "onBindChildViewHolder: " + info.getTime());
         holder.mTvUpdateTime.setText(DateUtils.convertTimeMill(info.getTime() * 1000));
         holder.mTvApkPath.setText(info.getApkPath());
         holder.mTvPackageName.setText(info.getPackageName());
@@ -268,11 +310,11 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
 
         if ((expandState & ExpandableItemConstants.STATE_FLAG_IS_UPDATED) != 0) {
             boolean isExpanded;
-            boolean animateIndicator = ((expandState & Expandable
+            boolean animateIndicator = ((expandState & ExpandableItemConstants
                     .STATE_FLAG_HAS_EXPANDED_STATE_CHANGED) !=
                     0);
 
-            if ((expandState & Expandable.STATE_FLAG_IS_EXPANDED) != 0) {
+            if ((expandState & ExpandableItemConstants.STATE_FLAG_IS_EXPANDED) != 0) {
                 isExpanded = true;
             } else {
                 isExpanded = false;

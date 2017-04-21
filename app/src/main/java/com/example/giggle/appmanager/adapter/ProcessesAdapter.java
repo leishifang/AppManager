@@ -139,7 +139,7 @@ public class ProcessesAdapter
         return null;
     }
 
-    private static class SwipeLeftAndRightResultAction extends SwipeResultActionMoveToSwipedDirection {
+    private  class SwipeLeftAndRightResultAction extends SwipeResultActionMoveToSwipedDirection {
 
         private ProcessesAdapter mAdapter;
         private final int mPosition;

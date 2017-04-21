@@ -127,7 +127,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
             mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
             mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
 
-            apkAdapter = new ApkAdapter(infos, this);
+            apkAdapter = new ApkAdapter(infos, mRecyclerViewExpandableItemManager,this);
 
             mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
             mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
@@ -158,6 +158,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
                 .MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.TITLE}, null, null, null);
 
         if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+            int id = 0;
             do {
                 String path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
                 if (path != null && path.endsWith(".apk")) {
@@ -179,6 +180,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
                     apkInfo.setLable(packageInfo.applicationInfo.loadLabel(pm).toString());
                     apkInfo.setVersionName(packageInfo.versionName);
                     apkInfo.setPackageName(packageInfo.packageName);
+                    apkInfo.setId(id++);
                     apkInfos.add(apkInfo);
 
                     updateProgress(apkInfos.size());
