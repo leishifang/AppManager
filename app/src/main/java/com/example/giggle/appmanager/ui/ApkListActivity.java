@@ -10,10 +10,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +31,7 @@ import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandab
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +49,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class ApkListActivity extends AppCompatActivity implements RecyclerViewExpandableItemManager
-        .OnGroupCollapseListener, RecyclerViewExpandableItemManager.OnGroupExpandListener {
+        .OnGroupCollapseListener, RecyclerViewExpandableItemManager.OnGroupExpandListener, Toolbar
+        .OnMenuItemClickListener {
 
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
     private static final String TAG = "ApkListActivity";
@@ -57,6 +63,8 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
     @BindView(R.id.tv_empty)
     TextView mTvEmpty;
 
+    private Toolbar toolbar;
+
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
     private RecyclerViewSwipeManager mRecyclerViewSwipeManager;
@@ -68,15 +76,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
         ButterKnife.bind(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+
         initView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PackageManager.PERMISSION_GRANTED != checkSelfPermission
@@ -92,6 +92,22 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
     }
 
     private void initView() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        toolbar.setOnMenuItemClickListener(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.apk_menu, menu);
+        return true;
     }
 
     private void getData() {
@@ -127,7 +143,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
             mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
             mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
 
-            apkAdapter = new ApkAdapter(infos, mRecyclerViewExpandableItemManager,this);
+            apkAdapter = new ApkAdapter(infos, mRecyclerViewExpandableItemManager, this);
 
             mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
             mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
@@ -146,6 +162,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
             mTvEmpty.setVisibility(View.GONE);
         }
         hideProgress();
+        updataSubTitle(infos.size());
     }
 
     private ArrayList<ApkInfo> getApkInfo() {
@@ -238,5 +255,34 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
     public void hideProgress() {
         mImgLoading.hide();
         mTvProgress.setVisibility(View.INVISIBLE);
+    }
+
+    public void updataSubTitle(int count) {
+        toolbar.setSubtitle("共有" + count + "个安装包");
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete_all:
+                if (apkAdapter == null || apkAdapter.getData() == null || apkAdapter.getData().size() == 0) {
+                } else {
+                    List<ApkInfo> infos = apkAdapter.getData();
+                    for (int i = 0; i < infos.size(); i++) {
+                        File file = new File(infos.get(i).getApkPath());
+                        if (file.isFile() && file.exists()) {
+                            if (file.delete()) {
+                                Snackbar.make(this.mRecyclerView, "删除成功", Snackbar.LENGTH_SHORT).show();
+                            } else {
+                                Snackbar.make(this.mRecyclerView, "删除失败", Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+                apkAdapter.clearData();
+                updataSubTitle(apkAdapter.getData().size());
+                break;
+        }
+        return true;
     }
 }

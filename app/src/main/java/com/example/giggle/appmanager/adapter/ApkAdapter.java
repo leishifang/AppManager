@@ -1,6 +1,5 @@
 package com.example.giggle.appmanager.adapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.IntRange;
@@ -17,6 +16,7 @@ import android.widget.TextView;
 import com.example.giggle.appmanager.MyApplication;
 import com.example.giggle.appmanager.R;
 import com.example.giggle.appmanager.bean.ApkInfo;
+import com.example.giggle.appmanager.ui.ApkListActivity;
 import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
@@ -47,7 +47,7 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
     private static final String TAG = "ApkAdapter";
 
     private List<ApkInfo> data;
-    private Context mContext;
+    private ApkListActivity mContext;
     private final RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
 
     private class MyLeftAndRightSwipeResultAction extends SwipeResultActionMoveToSwipedDirection {
@@ -78,6 +78,7 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
             }
             mAdapter.data.remove(mGroupPosition);
             mAdapter.mRecyclerViewExpandableItemManager.notifyGroupItemRemoved(mGroupPosition);
+            mContext.updataSubTitle(data.size());
         }
 
         @Override
@@ -86,7 +87,8 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         }
     }
 
-    public ApkAdapter(List<ApkInfo> apkInfoList, RecyclerViewExpandableItemManager manager, Context context) {
+    public ApkAdapter(List<ApkInfo> apkInfoList, RecyclerViewExpandableItemManager manager, ApkListActivity
+            context) {
         setHasStableIds(true);
         mContext = context;
         setData(apkInfoList);
@@ -291,12 +293,18 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         });
     }
 
+    public void clearData() {
+        data.clear();
+        notifyDataSetChanged();
+    }
+
     public void removeItem(int groupPosition) {
         data.remove(groupPosition);
         //不设置会导致删除项不折叠
         notifyItemRemoved(groupPosition);
         //不设置会导致列表顺序错乱
         notifyDataSetChanged();
+        mContext.updataSubTitle(data.size());
     }
 
     @Override
