@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,8 +20,13 @@ import com.example.giggle.appmanager.bean.ApkInfo;
 import com.example.giggle.appmanager.utils.DateUtils;
 import com.example.giggle.appmanager.widget.ExpandableItemIndicator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemConstants;
+import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemViewHolder;
+import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableSwipeableItemAdapter;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemViewHolder;
+import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 
 import java.io.File;
 import java.util.List;
@@ -33,12 +39,47 @@ import butterknife.ButterKnife;
  */
 
 public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupViewHolder, ApkAdapter
+        .ChildViewHolder> implements ExpandableSwipeableItemAdapter<ApkAdapter.GroupViewHolder, ApkAdapter
         .ChildViewHolder> {
 
     private static final String TAG = "ApkAdapter";
 
     private List<ApkInfo> data;
     private Context mContext;
+
+    @Override
+    public SwipeResultAction onSwipeGroupItem(GroupViewHolder holder, int groupPosition, int result) {
+        Log.d(TAG, "onSwipeGroupItem: " + groupPosition);
+        return null;
+    }
+
+    @Override
+    public SwipeResultAction onSwipeChildItem(ChildViewHolder holder, int groupPosition, int childPosition,
+                                              int result) {
+        return null;
+    }
+
+    @Override
+    public int onGetGroupItemSwipeReactionType(GroupViewHolder holder, int groupPosition, int x, int y) {
+        return SwipeableItemConstants.REACTION_CAN_SWIPE_BOTH_H;
+    }
+
+    @Override
+    public int onGetChildItemSwipeReactionType(ChildViewHolder holder, int groupPosition, int
+            childPosition, int x, int y) {
+        return SwipeableItemConstants.REACTION_CAN_NOT_SWIPE_ANY;
+    }
+
+    @Override
+    public void onSetGroupItemSwipeBackground(GroupViewHolder holder, int groupPosition, int type) {
+
+    }
+
+    @Override
+    public void onSetChildItemSwipeBackground(ChildViewHolder holder, int groupPosition, int childPosition,
+                                              int type) {
+
+    }
 
     private interface Expandable extends ExpandableItemConstants {
 
@@ -50,7 +91,8 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         data = apkInfoList;
     }
 
-    public static class GroupViewHolder extends AbstractExpandableItemViewHolder {
+    public static class GroupViewHolder extends AbstractSwipeableItemViewHolder implements
+            ExpandableItemViewHolder {
 
         @BindView(R.id.indicator)
         ExpandableItemIndicator mIndicator;
@@ -60,10 +102,29 @@ public class ApkAdapter extends AbstractExpandableItemAdapter<ApkAdapter.GroupVi
         TextView mTvLable;
         @BindView(R.id.tv_size)
         TextView mTvSize;
+        @BindView(R.id.container)
+        FrameLayout mContainer;
+
+        private int mExpandStateFlags;
 
         public GroupViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public View getSwipeableContainerView() {
+            return mContainer;
+        }
+
+        @Override
+        public int getExpandStateFlags() {
+            return mExpandStateFlags;
+        }
+
+        @Override
+        public void setExpandStateFlags(int flag) {
+            mExpandStateFlags = flag;
         }
     }
 

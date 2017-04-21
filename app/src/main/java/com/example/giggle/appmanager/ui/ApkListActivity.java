@@ -24,6 +24,7 @@ import com.example.giggle.appmanager.utils.PermissionUtils;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
+    private RecyclerViewSwipeManager mRecyclerViewSwipeManager;
     private RecyclerView.Adapter mWrappedAdapter;
     private ApkAdapter apkAdapter;
 
@@ -118,21 +120,29 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
             mTvEmpty.setVisibility(View.VISIBLE);
         } else {
             mLayoutManager = new LinearLayoutManager(this);
+
             mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(null);
+            mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
+
             mRecyclerViewExpandableItemManager.setOnGroupCollapseListener(this);
             mRecyclerViewExpandableItemManager.setOnGroupExpandListener(this);
 
             apkAdapter = new ApkAdapter(infos, this);
 
             mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(apkAdapter);
+            mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
 
             final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
             animator.setSupportsChangeAnimations(false);
             //指示箭头动画
             mRecyclerView.setItemAnimator(animator);
+
             mRecyclerView.setLayoutManager(mLayoutManager);
+
             mRecyclerView.setAdapter(mWrappedAdapter);
+
             mRecyclerViewExpandableItemManager.attachRecyclerView(mRecyclerView);
+            mRecyclerViewSwipeManager.attachRecyclerView(mRecyclerView);
             mTvEmpty.setVisibility(View.GONE);
         }
         hideProgress();

@@ -84,6 +84,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private Toolbar.OnMenuItemClickListener mOnMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
+            if (myItemAdapter == null) {
+                return true;
+            }
             switch (item.getItemId()) {
                 case R.id.action_system:
                     myItemAdapter.setData(getInfo(1));
@@ -164,7 +167,9 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                myItemAdapter.getFilter().filter(newText.toLowerCase());
+                if (myItemAdapter != null) {
+                    myItemAdapter.getFilter().filter(newText.toLowerCase());
+                }
                 return false;
             }
         });
@@ -177,13 +182,15 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
      */
     private List<AppInfo> getInfo(int type) {
         List<AppInfo> infos = new ArrayList<>();
+        if (mAppInfosAll == null) {
+            return null;
+        }
         switch (type) {
             case 0:
                 return mAppInfosAll;
             case 1:
                 for (AppInfo info : mAppInfosAll) {
                     if (info.isSys()) {
-                        Log.d(TAG, "getInfo: " + info.getLable());
                         infos.add(info);
                     }
                 }
@@ -191,7 +198,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             case 2:
                 for (AppInfo info : mAppInfosAll) {
                     if (!info.isSys()) {
-                        Log.d(TAG, "getInfo: " + info.getLable());
                         infos.add(info);
                     }
                 }
@@ -199,7 +205,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
             default:
                 return null;
         }
-
         return infos;
     }
 
@@ -351,7 +356,7 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 if (resultCode == RESULT_OK) {
                     myItemAdapter.removeItem(myItemAdapter.getCurrentPosition());
                     Snackbar.make(mContainer, "卸载成功", Snackbar.LENGTH_SHORT).show();
-                } else {
+                } else if (resultCode != RESULT_CANCELED) {
                     Snackbar.make(mContainer, "卸载失败", Snackbar.LENGTH_SHORT).show();
                 }
                 break;
