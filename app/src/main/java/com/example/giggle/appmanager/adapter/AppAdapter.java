@@ -16,11 +16,9 @@
 
 package com.example.giggle.appmanager.adapter;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +54,7 @@ public class AppAdapter
     private List<AppInfo> mAppInfos;
     private List<AppInfo> mAllInfos;
 
-    private Activity mContext;
+    private AppListActivity mContext;
     /**
      * 卸载应用的position
      */
@@ -84,6 +82,7 @@ public class AppAdapter
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 mAppInfos = (List<AppInfo>) filterResults.values;
+                mEventListener.updataAppCount(mAppInfos.size());
                 notifyDataSetChanged();
             }
         };
@@ -143,10 +142,13 @@ public class AppAdapter
         setHasStableIds(true);
     }
 
-    public AppAdapter(List<AppInfo> infos, Activity context, EventListener e) {
+    public AppAdapter(List<AppInfo> infos, AppListActivity context, EventListener e) {
         this();
-        this.mAppInfos = infos;
+        this.mAppInfos = new ArrayList<>();
+        mAppInfos.addAll(infos);
+
         this.mAllInfos = infos;
+
         mContext = context;
         mEventListener = e;
         getEventListener().updataAppCount(mAppInfos.size());
@@ -161,11 +163,17 @@ public class AppAdapter
     }
 
     public void setData(List<AppInfo> infos) {
-        //mAppInfos.clear();
-        mAppInfos = infos;
-        mAllInfos = infos;
+        this.mAppInfos = new ArrayList<>();
+        mAppInfos.addAll(infos);
+
+        this.mAllInfos = infos;
+
         notifyDataSetChanged();
         getEventListener().updataAppCount(mAppInfos.size());
+    }
+
+    public List<AppInfo> getData() {
+        return mAppInfos;
     }
 
     @Override
@@ -276,7 +284,8 @@ public class AppAdapter
     }
 
     public void removeItem(int groupPosition) {
-        Log.d(TAG, "removeItem: " + groupPosition);
+        mContext.getAppInfosAll().remove(mContext.getAppInfosAll().indexOf(mAppInfos.get(groupPosition)));
+        mAllInfos.remove(mAllInfos.indexOf(mAppInfos.get(groupPosition)));
         mAppInfos.remove(groupPosition);
         //不设置会导致删除项不折叠
         notifyItemRemoved(groupPosition);

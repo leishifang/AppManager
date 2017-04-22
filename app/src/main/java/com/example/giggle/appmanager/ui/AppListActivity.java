@@ -77,6 +77,10 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
 
+    public List<AppInfo> getAppInfosAll() {
+        return mAppInfosAll;
+    }
+
     List<AppInfo> mAppInfosAll;
 
     Toolbar mToolbar;
@@ -350,7 +354,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: " + requestCode + "," + resultCode);
         switch (requestCode) {
             case UNINSTALL_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
