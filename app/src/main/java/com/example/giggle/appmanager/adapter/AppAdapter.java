@@ -311,7 +311,7 @@ public class AppAdapter
             holder.mIndicator.setExpandedState(isExpanded, animateIndicator);
         }
     }
-
+ 
     @Override
     public boolean onCheckCanExpandOrCollapseGroup(MyGroupViewHolder holder, int groupPosition, int x, int
             y, boolean expand) {

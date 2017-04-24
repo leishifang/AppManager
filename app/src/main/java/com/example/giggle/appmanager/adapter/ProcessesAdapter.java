@@ -17,7 +17,6 @@
 package com.example.giggle.appmanager.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +87,19 @@ public class ProcessesAdapter
         return mEventListener;
     }
 
+    public void deleteAll() {
+        if (mEventListener != null && mInfos != null && mInfos.size() >= 0) {
+            for (ProcessInfo info : mInfos) {
+                getEventListener().onLeftAndRighMoved(info.getPackageName());
+            }
+        }
+    }
+
+    public void setData(List<ProcessInfo> infos) {
+        mInfos = infos;
+        notifyDataSetChanged();
+    }
+
     @Override
     public long getItemId(int position) {
         return mInfos.get(position).getPid();
@@ -139,7 +151,7 @@ public class ProcessesAdapter
         return null;
     }
 
-    private  class SwipeLeftAndRightResultAction extends SwipeResultActionMoveToSwipedDirection {
+    private class SwipeLeftAndRightResultAction extends SwipeResultActionMoveToSwipedDirection {
 
         private ProcessesAdapter mAdapter;
         private final int mPosition;
@@ -153,7 +165,8 @@ public class ProcessesAdapter
         protected void onPerformAction() {
             super.onPerformAction();
             if (mAdapter.mEventListener != null) {
-                mAdapter.mEventListener.onLeftAndRighMoved(mAdapter.mInfos.get(mPosition).getPackageName());
+                mAdapter.getEventListener().onLeftAndRighMoved(mAdapter.mInfos.get(mPosition)
+                        .getPackageName());
                 mAdapter.mInfos.remove(mPosition);
                 mAdapter.notifyItemRemoved(mPosition);
             }

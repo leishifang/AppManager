@@ -10,7 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -41,7 +42,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by leishifang on 2017/4/19 16:45.
  */
 
-public class ProcessActivity extends AppCompatActivity {
+public class ProcessActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
 
     private static final String TAG = ProcessActivity.class.toString();
     @BindView(R.id.tv_empty)
@@ -69,14 +70,7 @@ public class ProcessActivity extends AppCompatActivity {
         setContentView(R.layout.list_layout);
         ButterKnife.bind(this);
 
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        initView();
         mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         Observable.create(new ObservableOnSubscribe<List<ProcessInfo>>() {
@@ -95,6 +89,18 @@ public class ProcessActivity extends AppCompatActivity {
                         fillAdapter(processInfos);
                     }
                 });
+    }
+
+    private void initView() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        mToolbar.setOnMenuItemClickListener(this);
     }
 
     private List<ProcessInfo> getRunningProcessesInfo() {
@@ -142,7 +148,6 @@ public class ProcessActivity extends AppCompatActivity {
             processesAdapter.setEventListener(new ProcessesAdapter.EventListener() {
                 @Override
                 public void onLeftAndRighMoved(String pckName) {
-                    Log.d(TAG, "onLeftAndRighMoved: " + pckName);
                     mActivityManager.killBackgroundProcesses(pckName);
                 }
             });
@@ -159,7 +164,12 @@ public class ProcessActivity extends AppCompatActivity {
             mRecyclerViewTouchActionGuardManager.attachRecyclerView(mRecyclerView);
             mRecyclerViewSwipeManager.attachRecyclerView(mRecyclerView);
         }
+        updateSubTitle(infos.size());
         hideProgress();
+    }
+
+    public void updateSubTitle(int count) {
+        mToolbar.setSubtitle("进程数：" + count);
     }
 
     private void updateProgress(final int progress) {
@@ -173,12 +183,56 @@ public class ProcessActivity extends AppCompatActivity {
     }
 
     public void showProgress() {
-        mImgLoading.show();
-        mTvProgress.setVisibility(View.VISIBLE);
+        mImgLoading.post(new Runnable() {
+            @Override
+            public void run() {
+                mImgLoading.show();
+                mTvProgress.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void hideProgress() {
-        mImgLoading.hide();
-        mTvProgress.setVisibility(View.INVISIBLE);
+        mImgLoading.post(new Runnable() {
+            @Override
+            public void run() {
+                mImgLoading.hide();
+                mTvProgress.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.delete_all_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete_all:
+                ((ProcessesAdapter) mAdapter).deleteAll();
+                Observable.create(new ObservableOnSubscribe<List<ProcessInfo>>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<List<ProcessInfo>> e) throws Exception {
+                        List<ProcessInfo> infos = getRunningProcessesInfo();
+                        e.onNext(infos);
+                        e.onComplete();
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<List<ProcessInfo>>() {
+                            @Override
+                            public void accept(List<ProcessInfo> processInfos) throws Exception {
+                                ((ProcessesAdapter) mAdapter).setData(processInfos);
+                                hideProgress();
+                                updateSubTitle(processInfos.size());
+                            }
+                        });
+                break;
+        }
+        return false;
     }
 }

@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,7 +105,7 @@ public class ApkListActivity extends AppCompatActivity implements RecyclerViewEx
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.apk_menu, menu);
+        getMenuInflater().inflate(R.menu.delete_all_menu, menu);
         return true;
     }
 
