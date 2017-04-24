@@ -205,6 +205,7 @@ public class ProcessActivity extends AppCompatActivity implements Toolbar.OnMenu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.delete_all_menu, menu);
+        mToolbar.getMenu().getItem(0).setTitle("清理所有");
         return true;
     }
 
