@@ -61,33 +61,6 @@ public class AppAdapter
     private int currentPosition;
     private EventListener mEventListener;
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                FilterResults filterResults = new FilterResults();
-                List<AppInfo> result = new ArrayList<>();
-
-                for (AppInfo appInfo : mAllInfos) {
-                    if (appInfo.getLable().toLowerCase().contains(charSequence)) {
-                        result.add(appInfo);
-                    }
-                }
-                filterResults.values = result;
-                filterResults.count = result.size();
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mAppInfos = (List<AppInfo>) filterResults.values;
-                mEventListener.updataAppCount(mAppInfos.size());
-                notifyDataSetChanged();
-            }
-        };
-    }
-
     public interface EventListener {
 
         void updataAppCount(int count);
@@ -95,6 +68,30 @@ public class AppAdapter
 
     private interface Expandable extends ExpandableItemConstants {
 
+    }
+
+    public AppAdapter() {
+        // ExpandableItemAdapter requires stable ID, and also
+        // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
+        setHasStableIds(true);
+    }
+
+    public AppAdapter(List<AppInfo> infos, AppListActivity context, EventListener e) {
+        this();
+
+        mContext = context;
+        mEventListener = e;
+        setData(infos);
+    }
+
+    public void setData(List<AppInfo> infos) {
+        this.mAppInfos = new ArrayList<>();
+        mAppInfos.addAll(infos);
+
+        this.mAllInfos = infos;
+
+        notifyDataSetChanged();
+        getEventListener().updataAppCount(mAppInfos.size());
     }
 
     public static class MyGroupViewHolder extends AbstractExpandableItemViewHolder {
@@ -136,22 +133,31 @@ public class AppAdapter
         }
     }
 
-    public AppAdapter() {
-        // ExpandableItemAdapter requires stable ID, and also
-        // have to implement the getGroupItemId()/getChildItemId() methods appropriately.
-        setHasStableIds(true);
-    }
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                FilterResults filterResults = new FilterResults();
+                List<AppInfo> result = new ArrayList<>();
 
-    public AppAdapter(List<AppInfo> infos, AppListActivity context, EventListener e) {
-        this();
-        this.mAppInfos = new ArrayList<>();
-        mAppInfos.addAll(infos);
+                for (AppInfo appInfo : mAllInfos) {
+                    if (appInfo.getLable().toLowerCase().contains(charSequence)) {
+                        result.add(appInfo);
+                    }
+                }
+                filterResults.values = result;
+                filterResults.count = result.size();
+                return filterResults;
+            }
 
-        this.mAllInfos = infos;
-
-        mContext = context;
-        mEventListener = e;
-        getEventListener().updataAppCount(mAppInfos.size());
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mAppInfos = (List<AppInfo>) filterResults.values;
+                mEventListener.updataAppCount(mAppInfos.size());
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public void setEventListener(EventListener eventListener) {
@@ -160,16 +166,6 @@ public class AppAdapter
 
     public EventListener getEventListener() {
         return mEventListener;
-    }
-
-    public void setData(List<AppInfo> infos) {
-        this.mAppInfos = new ArrayList<>();
-        mAppInfos.addAll(infos);
-
-        this.mAllInfos = infos;
-
-        notifyDataSetChanged();
-        getEventListener().updataAppCount(mAppInfos.size());
     }
 
     public List<AppInfo> getData() {
@@ -311,7 +307,7 @@ public class AppAdapter
             holder.mIndicator.setExpandedState(isExpanded, animateIndicator);
         }
     }
- 
+
     @Override
     public boolean onCheckCanExpandOrCollapseGroup(MyGroupViewHolder holder, int groupPosition, int x, int
             y, boolean expand) {

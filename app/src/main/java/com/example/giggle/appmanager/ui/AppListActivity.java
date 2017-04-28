@@ -19,7 +19,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -116,17 +115,16 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
 
         initView();
 
-        showProgress();
-
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable
                 (SAVED_STATE_EXPANDABLE_ITEM_MANAGER) : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
 
+        showProgress();
         // TODO: 2017/3/23 未进行生命周期控制
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> e) throws Exception {
-                e.onNext(getInfo());
+                e.onNext(getInfo(0));
                 e.onComplete();
             }
         })
@@ -185,13 +183,15 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
      * @return
      */
     private List<AppInfo> getInfo(int type) {
+
         List<AppInfo> infos = new ArrayList<>();
         if (mAppInfosAll == null) {
-            return null;
+            mAppInfosAll = getInfo();
         }
         switch (type) {
             case 0:
-                return mAppInfosAll;
+                infos.addAll(mAppInfosAll);
+                break;
             case 1:
                 for (AppInfo info : mAppInfosAll) {
                     if (info.isSys()) {
@@ -263,7 +263,6 @@ public class AppListActivity extends AppCompatActivity implements RecyclerViewEx
                 return info.getLable().compareTo(t1.getLable());
             }
         });
-        mAppInfosAll = appInfos;
         return appInfos;
     }
 
